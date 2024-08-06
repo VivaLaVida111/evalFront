@@ -12,7 +12,7 @@
     >
       <!-- 系统名字 -->
       <template #title>
-        <span class="text-title">金牛区环境治理考评系统</span>
+        <span class="text-title">金牛区城乡环境综合治理体征监测系统</span>
       </template>
       <!-- 时间 -->
 
@@ -55,8 +55,7 @@
 
     <div class="mainDiv">
       <div class="columns">
-
-        <div class="panel bar" >
+        <div class="panel bar">
           <h2>金牛区各街道成绩排名</h2>
 
           <div id="horizontal_bar"></div>
@@ -103,7 +102,6 @@
 
           <div class="panel_footer"></div>
         </div> -->
-        
       </div>
       <div class="columns">
         <div class="no">
@@ -147,11 +145,7 @@
           </tdt-map>
         </div>
       </div>
-      <div class="columns">
-        
-
-    
-      </div>
+      <div class="columns"></div>
     </div>
   </body>
 </template>
@@ -171,7 +165,6 @@ import {
   onBeforeUnmount,
 } from "vue";
 // 调用接口中的方法
-import { getPage, getQuery, getJinNniuToday } from "@/api/content.js";
 
 // 搜索的图标
 import { Location, Search } from "@element-plus/icons-vue";
@@ -181,148 +174,24 @@ import { useRouter, useRoute } from "vue-router";
 import Charts from "@jiaminghi/charts";
 import { House, ArrowDown, Setting, Link } from "@element-plus/icons-vue";
 import Header from "@/components/Header.vue";
-
 import axios from "axios";
-import { getCarGps, getAllGps } from "@/api/content";
-import { getCarsLocation } from "@/api/home";
+
 // import { getFlows, getFlows_xihua } from "@/api/content.js";
 
 import moment from "moment";
 
 // ========================================================sunny
-
-const defaultVisible = ref(false);
-const tianfuList = reactive([]);
-const renheList = reactive([]);
-
-const total_xihua = ref(0);
-
-//=================================================地图页面中间显示数字
-const total_jinniu = ref(0);
-const total_hongxing = ref(0);
-const today_flow = ref(0);
-const cumulative_flow = ref(0);
-const total_jinniu_fixed = ref("");
-var time = new Date().getTime();
-const tomorrow =
-  new Date(time + 1 * 24 * 60 * 60 * 1000).getFullYear() +
-  "-" +
-  (new Date(time + 1 * 24 * 60 * 60 * 1000).getMonth() + 1) +
-  "-" +
-  new Date(time + 1 * 24 * 60 * 60 * 1000).getDate();
-
-/* onBeforeMount(() => {
-  axios({
-    url: "/OsmoticFluid/shenlvye/getRecord",
-    method: "get",
-  }).then(function (resp) {
-    if (resp.status == 200) {
-      var data = resp.data.data;
-      today_flow.value = data.今日流量;
-      axios({
-        url: "/OsmoticFluid/shenlvye/getRecordByStation?station=xihua",
-        method: "get",
-      }).then(function (resp) {
-        if (resp.status == 200) {
-          var data = resp.data.data;
-          today_flow.value = today_flow.value + data.今日流量;
-        }
-      });
-    }
-  });
-  var start = moment().startOf("month").format("YYYY-MM-DD");
-  var end = moment().format("YYYY-MM-DD");
-
-  console.log("end:" + end);
-  //统计一个月的总量
-  getSiteNameList(1, start + "T23:59:00", end + "T23:59:00", 1000);
-
-  getQuery("红星", "transporter", today, tomorrow, 1, 10000).then(function (
-    resp
-  ) {
-    total_hongxing.value = 0;
-    for (let i = 0; i < resp.length; i++) {
-      total_hongxing.value = resp[i].netWeight + total_hongxing.value;
-    }
-    total_hongxing.value =
-      Math.floor((total_hongxing.value / 1000) * 100) / 100;
-    total_jinniu.value = total_hongxing.value + total_jinniu.value;
-  });
-  getQuery("西华", "transporter", today, tomorrow, 1, 10000).then(function (
-    resp
-  ) {
-    total_xihua.value = 0;
-    for (let i = 0; i < resp.length; i++) {
-      total_xihua.value = resp[i].netWeight + total_xihua.value;
-    }
-    total_xihua.value = Math.floor((total_xihua.value / 1000) * 100) / 100;
-    total_jinniu.value = total_xihua.value + total_jinniu.value;
-
-    total_jinniu.value = Math.floor(total_jinniu.value * 100) / 100;
-    total_jinniu_fixed.value = total_jinniu.value.toFixed(2);
-  });
-}); */
-
-// =========================================================
-// ============================================================
-
-var time = new Date().getTime();
-// 获取当前时间，转化时间戳为正常格式
-const current_time =
-  new Date().getFullYear() +
-  "-" +
-  (new Date().getMonth() + 1) +
-  "-" +
-  new Date().getDate() +
-  "T" +
-  new Date().getHours().toString().padStart(2, 0) +
-  ":" +
-  new Date().getMinutes().toString().padStart(2, 0) +
-  ":" +
-  new Date().getSeconds().toString().padStart(2, 0);
-const time_before_one_minutes =
-  new Date(time - 12 * 60 * 60 * 1000).getFullYear() +
-  "-" +
-  (new Date(time - 12 * 60 * 60 * 1000).getMonth() + 1) +
-  "-" +
-  new Date(time - 12 * 60 * 60 * 1000).getDate() +
-  "T" +
-  new Date().getHours().toString().padStart(2, 0) +
-  ":" +
-  new Date().getMinutes().toString().padStart(2, 0) +
-  ":" +
-  new Date().getSeconds().toString().padStart(2, 0);
-
-console.log(time_before_one_minutes);
 function logout() {
   //TODO 清除登录信息
   router.push("/login");
 }
-let total_records = ref(1000);
-let current_page = ref(1);
-let totalrecords = ref(1000);
-let currentpage = ref(1);
-var renhe_car = new Map();
-var tianfu_car = new Map();
-const today =
-  new Date().getFullYear() +
-  "-" +
-  (new Date().getMonth() + 1) +
-  "-" +
-  new Date().getDate();
-const now_time =
-  new Date().getHours() +
-  ":" +
-  new Date().getMinutes() +
-  ":" +
-  new Date().getSeconds();
-console.log(current_time);
 
-onMounted(() => {
-  if (window.screen.width > 2000 && window.devicePixelRatio == 1) {
-    document.getElementsByClassName("container")[1].style.marginLeft = "750px";
-  }
-});
+// onMounted(() => {
+//   if (window.screen.width > 2000 && window.devicePixelRatio == 1) {
+//     console.log("getElementsByClassName: "  + document.getElementsByClassName("container"));
+//     document.getElementsByClassName("container")[1].style.marginLeft = "750px";
+//   }
+// });
 
 // =====================================================================================
 
@@ -2064,301 +1933,90 @@ const fontSizeSwitch = (res) => {
   let fontSize = 100 * (clientWidth / 1707);
   return res * fontSize;
 };
-//定义total
-const total = ref(2);
-//全局定义图表
-let category_chart = null;
-
-//图表的基础模板
-
-let categoryOption = {
-  tooltip: {
-    trigger: "item",
-    formatter: function (params) {
-      // 在 tooltip 中添加多行文本，包括标题和数值
-      return (
-        "当天垃圾净重总量 <br>" + params.name + "   " + params.value + "吨"
-      );
-    },
-  },
-  legend: {
-    bottom: "2%",
-    left: "center",
-    selectedMode: false,
-
-    textStyle: {
-      color: "rgba(255,255,255,0.8)",
-      fontSize: "12",
-    },
-  },
-
-  series: [
-    {
-      name: "当天垃圾净重总量",
-      //设置图表类型是折线图
-      type: "pie",
-      radius: ["65%"],
-      center: ["50%", "40%"],
-
-      startAngle: 180,
-      label: {
-        show: false,
-        position: "center",
-        formatter(param) {
-          // correct the percentage
-          return param.name + " (" + param.percent + "%)";
-        },
-        color: "#fff",
-      },
-      emphasis: {
-        label: {
-          show: true,
-          fontSize: 20,
-          fontWeight: "bold",
-        },
-      },
-      data: [
-        { value: 50, name: "红星" },
-        { value: 50, name: "西华" },
-        {
-          // make an record to fill the bottom 50%
-
-          itemStyle: {
-            // stop the chart from rendering this piece
-            color: "none",
-            decal: {
-              symbol: "none",
-            },
-          },
-          label: {
-            show: false,
-          },
-        },
-      ],
-    },
-  ],
-};
-
-/**
- * 获取后端数据，并动态展示在图表上
- */
-const create_category_data = () => {
-  let chartDom = document.getElementById("large_pie");
-  //初始化图表
-  category_chart = echarts.init(chartDom);
-  // category_chart.on("click", (params) => {
-  //   console.log("params:" + params.data.name);
-  // });
-
-  //绘制图表
-  category_chart.setOption(categoryOption);
-  window.addEventListener("resize", category_chart.resize);
-
-  
-};
 
 /**
  * 横向柱形图1
  */
-const data = [];
-for (let i = 0; i < 13; ++i) {
-  data.push(Math.round(Math.random() * 200));
-}
+var start = moment().startOf("month").format("YYYY-MM-DD");
+var end = moment().format("YYYY-MM-DD");
+const scoresList = reactive([]);
+const streetsList = reactive([]);
+
+const getScores = (startTime, endTime) => {
+  var URL = "/api/details/score/" + startTime + "/" + endTime;
+  console.log("URL: ", URL);
+  return axios({
+    url: URL,
+    method: "get",
+  }).then(function (resp) {
+    var data = resp.data.data;
+    console.log("getScores: ", data);
+    scoresList.splice(0, scoresList.length);
+    streetsList.splice(0, streetsList.length);
+    for (var key in data) {
+      scoresList.push(data[key].score);
+      streetsList.push(data[key].street);
+    }
+  });
+};
+
 const horizontalOpt = {
   xAxis: {
-    max: 'dataMax'
+    max: "dataMax",
   },
   yAxis: {
-    type: 'category',
-    data: ['街道1', '街道2', '街道3', '街道4', '街道5', '街道6', '街道7', '街道8', '街道9', '街道10', '街道11', '街道12', '街道13'],
+    type: "category",
+    data: streetsList,
     inverse: true,
     animationDuration: 300,
     animationDurationUpdate: 300,
-    max: 13 // only the largest 3 bars will be displayed
+    max: 13, // only the largest 3 bars will be displayed
   },
   series: [
     {
       realtimeSort: true,
-      name: '街道',
-      type: 'bar',
-      data: data,
+      name: "街道",
+      type: "bar",
+      data: scoresList,
       label: {
         show: true,
-        position: 'right',
-        valueAnimation: true
-      }
-    }
+        position: "right",
+        valueAnimation: true,
+      },
+    },
   ],
   legend: {
-    show: true
+    show: true,
   },
   animationDuration: 0,
   animationDurationUpdate: 3000,
-  animationEasing: 'linear',
-  animationEasingUpdate: 'linear'
+  animationEasing: "linear",
+  animationEasingUpdate: "linear",
 };
 
 let horizontalBar = null;
-const create_horizontal_bar = () => {
-  let chartDom = document.getElementById("horizontal_bar");
-  //初始化图表
-  horizontalBar = echarts.init(chartDom);
-  // category_chart.on("click", (params) => {
-  //   console.log("params:" + params.data.name);
-  // });
+const create_horizontal_bar = async () => {
+  try {
+    let chartDom = document.getElementById("horizontal_bar");
+    //初始化图表
+    horizontalBar = echarts.init(chartDom);
+    // category_chart.on("click", (params) => {
+    //   console.log("params:" + params.data.name);
+    // });
+    // getScores修改了streetList和scoresList
+    await getScores(start, end);
 
-  //绘制图表
-  horizontalBar.setOption(horizontalOpt);
-  //horizontalBar.resize();
-  window.addEventListener("resize", horizontalBar.resize);
-
-}
-
-
-
-
-// ======================================================================================================sunny
-/**
- * 左下饼图：展示金牛区小站垃圾净重量
- */
-//调整字体大小
-
-//定义total
-const total0 = ref(2);
-//全局定义图表
-let small_chart = null;
-
-//图表的基础模板
-let smallOption = {
-  color: ["#2f89cf"],
-  tooltip: {
-    trigger: "axis",
-    axisPointer: {
-      type: "shadow",
-    },
-    formatter: function (params) {
-      // 获取横坐标的内容
-      let xAxisLabel = params[0].axisValue;
-
-      // 获取数据项的数值
-      let dataValue = params[0].value;
-
-      // 构建 tooltip 内容并换行显示
-      return xAxisLabel + "<br>当天垃圾净重总量 " + dataValue + "吨";
-    },
-  },
-  grid: {
-    left: "0%",
-    top: "10px",
-    right: "0%",
-    bottom: "4%",
-    containLabel: true,
-  },
-  xAxis: [
-    {
-      type: "category",
-      data: [
-        "红花堰",
-        "五块石",
-        "五里墩",
-        "泉水",
-        "营门口",
-        "金泉",
-        "西北桥",
-        "黄忠",
-      ],
-      axisTick: {
-        alignWithLabel: true,
-      },
-      interval: 0,
-      axisLabel: {
-        fontSize: fontSizeSwitch(0.1),
-        show: true,
-        textStyle: {
-          color: "rgba(255,255,255,0.8)",
-          margin: 15,
-        },
-      },
-      axisLine: {
-        show: false,
-      },
-    },
-  ],
-  yAxis: [
-    {
-      type: "value",
-      axisLabel: {
-        fontSize: fontSizeSwitch(0.15),
-      },
-      axisLine: {
-        //y轴线的颜色以及宽度
-        show: false,
-        lineStyle: {
-          color: "rgba(255,255,255,0.8)",
-          width: 2,
-          // type: "solid",
-        },
-      },
-      splitLine: {
-        lineStyle: {
-          color: "rgba(255,255,255,0.1)",
-        },
-      },
-    },
-  ],
-  series: [
-    {
-      name: "当天垃圾净重总量",
-      //设置图表类型是折线图
-      type: "bar",
-      barWidth: "35%",
-      itemStyle: {
-        barBorderRadius: 5,
-      },
-      //  barMaxHeight:200,
-      data: [
-        { value: 0, name: "红花堰" },
-        { value: 0, name: "五块石" },
-        { value: 0, name: "五里墩" },
-        { value: 0, name: "泉水" },
-        { value: 0, name: "营门口" },
-        { value: 0, name: "金泉" },
-        { value: 0, name: "西北桥" },
-        { value: 0, name: "黄忠" },
-        // { value: 0, name: "其他小站" },
-      ],
-      emphasis: {
-        itemStyle: {
-          shadowBlur: 10,
-          shadowOffsetX: 0,
-          shadowColor: "rgba(0, 0, 0, 0.5)",
-        },
-      },
-      // label: {
-      //   overflow: "none",
-      //   show: true,
-      //   // position: 'top',
-      //   fontSize: fontSizeSwitch(0.12),
-      //   //展示每个点的对应数值，这里必须是{c}才能显示数据
-      //   formatter: "{b}:{c} 吨",
-      //   //修改标签上的字体颜色
-      //   color: "#fff",
-      // },
-    },
-  ],
-};
-
-/**
- * 获取后端数据，并动态展示在图表上
- */
-const create_small_data = () => {
-  let chartDom = document.getElementById("small_pie");
-  //初始化图表
-  small_chart = echarts.init(chartDom);
-
-  //绘制图表
-  small_chart.setOption(smallOption);
-  window.addEventListener("resize", small_chart.resize);
+    console.log("streetList: ", streetsList);
+    console.log("scoresList: ", scoresList);
+    horizontalOpt.yAxis.data = streetsList;
+    horizontalOpt.series[0].data = scoresList;
+    //绘制图表
+    horizontalBar.setOption(horizontalOpt);
+    //horizontalBar.resize();
+    window.addEventListener("resize", horizontalBar.resize);
+  } catch (error) {
+    console.error("Failed to create horizontal bar chart:", error);
+  }
 };
 
 // ======================================================================================================sunny
@@ -2385,233 +2043,6 @@ function getDateList(count, long) {
   }
   return categoryData;
 }
-//调整字体大小
-
-//定义total
-const total_tow = ref(7);
-//全局定义图表
-let tow_chart = null;
-
-//图表的基础模板
-let towOption = {
-  color: ["#00f2f1", "#ed3f35"],
-  tooltip: {
-    trigger: "axis",
-    formatter: function (params) {
-      // 获取横坐标的内容
-      let xAxisLabel = params[0].axisValue;
-
-      // 获取数据项的数值
-      let dataValue = params[0].value;
-
-      // 构建 tooltip 内容并换行显示
-      return xAxisLabel + "<br>大站垃圾总量 " + dataValue + "吨";
-    },
-  },
-  legend: {
-    data: ["大站垃圾总量", "小站垃圾总量"],
-    textStyle: {
-      color: "#4c9bfd",
-    },
-    right: "10%",
-  },
-  grid: {
-    top: "20%",
-    left: "3%",
-    right: "4%",
-    bottom: "3%",
-    show: true,
-    borderColor: "#012f4a",
-    containLabel: true,
-  },
-
-  xAxis: {
-    type: "category",
-    boundaryGap: false,
-    data: xAxis,
-    axisTick: {
-      show: false, //去除刻度线
-    },
-    axisLabel: {
-      color: "#4c9bfd", //文本颜色
-    },
-    axisLine: {
-      show: false, //去除轴线
-    },
-  },
-  yAxis: {
-    type: "value",
-    axisTick: {
-      show: false, //去除刻度线
-    },
-    axisLabel: {
-      color: "#4c9bfd", //文本颜色
-    },
-    axisLine: {
-      show: false, //去除轴线
-    },
-    splitLine: {
-      lineStyle: {
-        color: "#012f4a",
-      },
-    },
-  },
-  series: [
-    {
-      name: "大站垃圾总量",
-      type: "line",
-      stack: "Total",
-      data: [
-        { value: 0, name: "红花堰" },
-        { value: 0, name: "五块石" },
-        { value: 0, name: "五里墩" },
-        { value: 0, name: "其他小站" },
-        { value: 0, name: "其他小站" },
-        { value: 0, name: "其他小站" },
-        { value: 0, name: "其他小站" },
-      ],
-      smooth: true,
-    },
-  ],
-};
-
-/**
- * 获取后端数据，并动态展示在图表上
- */
-const create_tow_data = () => {
-  let chartDom = document.getElementById("tow_pie");
-  //初始化图表
-  tow_chart = echarts.init(chartDom);
-
-  //绘制图表
-  tow_chart.setOption(towOption);
-  window.addEventListener("resize", tow_chart.resize);
-  let honghuayan = 0;
-  let wukuaishi = 0;
-  let wulidun = 0;
-  let xihua = 0;
-  let hongxing = 0;
-
-  // console.log("时间" + site_name_date[1]);
-  // recent_days_total(site_name_date);
-  for (var date = 0; date < 7; date++) {
-    console.log("时间" + site_name_date[date]);
-    getStationsTotal(
-      moment().format("YYYY") + "-" + site_name_date[date],
-      moment().format("YYYY") + "-" + site_name_date[date],
-      "big_stations",
-      1,
-      10000,
-      date
-    );
-  }
-};
-//======================================================================================================
-
-// ======================================================================================================sunny
-/**
- * 右上图：展示仁和星牛最近4个小时内活动车辆数，以及未活动车辆数
- * 用柱状图
- * 最近4个小时：前端直接通过现有接口，拿到54辆车的最近一次gsp记录后，遍历，挨个判断每个记录的时间戳和当前时间的差，大于四个小时就丢到没活跃的集合里面去。
- */
-
-//定义total
-const total1 = ref(2);
-//全局定义图表
-let renhe_chart = null;
-
-//图表的基础模板
-let renheOption = {
-  color: ["#41C9CE", "#DC8D75"],
-  tooltip: {
-    trigger: "item",
-    formatter: function (params) {
-      // 在 tooltip 中添加多行文本，包括标题和数值
-      return "仁和星牛车辆 <br>" + params.name + "   " + params.value + "辆";
-    },
-  },
-  legend: {
-    bottom: "2%",
-    left: "center",
-    selectedMode: false,
-
-    textStyle: {
-      color: "rgba(255,255,255,0.8)",
-      fontSize: "12",
-    },
-  },
-
-  series: [
-    {
-      name: "仁和星牛车辆",
-      //设置图表类型是折线图
-      type: "pie",
-      radius: ["35%", "65%"],
-      center: ["50%", "40%"],
-
-      startAngle: 180,
-      label: {
-        show: false,
-        position: "center",
-        formatter(param) {
-          // correct the percentage
-          return param.name + " (" + param.percent + "%)";
-        },
-        color: "#fff",
-      },
-      emphasis: {
-        label: {
-          show: true,
-          fontSize: 20,
-          fontWeight: "bold",
-        },
-      },
-      itemStyle: {
-        borderRadius: 5,
-        borderColor: "#fff",
-        borderWidth: 2,
-      },
-      data: [
-        { value: 0, name: "在用" },
-        { value: 0, name: "停用" },
-        {
-          // make an record to fill the bottom 50%
-
-          itemStyle: {
-            // stop the chart from rendering this piece
-            color: "none",
-            decal: {
-              symbol: "none",
-            },
-          },
-          label: {
-            show: false,
-          },
-        },
-      ],
-    },
-  ],
-};
-
-/**
- * 获取后端数据，并动态展示在图表上
- */
-const create_renhe_data = () => {
-  let chartDom = document.getElementById("renhe_pie");
-  //初始化图表
-  renhe_chart = echarts.init(chartDom);
-
-  // renhe_chart.on("click", (params) => {
-  //   console.log("params:" + params.data.name);
-  //   renheVisible.value = true;
-  // });
-
-  //绘制图表
-  renhe_chart.setOption(renheOption);
-  window.addEventListener("resize", renhe_chart.resize);
-
-  
-};
 
 //删除字符串中多余的空格
 function trim(ele) {
@@ -2624,130 +2055,21 @@ function trim(ele) {
   }
 }
 
-// ======================================================================================================sunny
-/**
- * 右下图：展示天府环境最近4个小时内活动车辆数，以及未活动车辆数
- */
-
-//定义total
-const total2 = ref(2);
-//全局定义图表
-// let tianfu_chart = null;
-
-//图表的基础模板
-let tianfuOption = {
-  color: ["#41C9CE", "#DC8D75"],
-  tooltip: {
-    trigger: "item",
-    formatter: function (params) {
-      // 在 tooltip 中添加多行文本，包括标题和数值
-      return "天府环境车辆 <br>" + params.name + "   " + params.value + "辆";
-    },
-  },
-  legend: {
-    bottom: "2%",
-    left: "center",
-    selectedMode: false,
-
-    textStyle: {
-      color: "rgba(255,255,255,0.8)",
-      fontSize: "12",
-    },
-  },
-
-  series: [
-    {
-      name: "天府环境车辆",
-      //设置图表类型是折线图
-      type: "pie",
-      radius: ["35%", "65%"],
-      center: ["50%", "40%"],
-
-      startAngle: 180,
-      label: {
-        show: false,
-        position: "center",
-        formatter(param) {
-          // correct the percentage
-          return param.name + " (" + param.percent + "%)";
-        },
-        color: "#fff",
-      },
-      emphasis: {
-        label: {
-          show: true,
-          fontSize: 20,
-          fontWeight: "bold",
-        },
-      },
-      itemStyle: {
-        borderRadius: 5,
-        borderColor: "#fff",
-        borderWidth: 2,
-      },
-      data: [
-        { value: 0, name: "在用" },
-        { value: 0, name: "停用" },
-        {
-          // make an record to fill the bottom 50%
-
-          itemStyle: {
-            // stop the chart from rendering this piece
-            color: "none",
-            decal: {
-              symbol: "none",
-            },
-          },
-          label: {
-            show: false,
-          },
-        },
-      ],
-    },
-  ],
-};
-
-/**
- * 获取后端数据，并动态展示在图表上
- */
-const create_tianfu_data = () => {
-  let chartDom = document.getElementById("tianfu_pie");
-  //初始化图表
-  let tianfu_chart = echarts.init(chartDom);
-
-  //绘制图表
-  tianfu_chart.setOption(tianfuOption);
-  window.addEventListener("resize", tianfu_chart.resize);
-};
-
 // =============================================================================sunny
 /**
  * Dom的挂载和销毁
  */
 //Dom挂载完毕，可以拿到组件渲染后的 DOM节点，展示图表
 onMounted(() => {
-  //create_small_data();
-  //create_tow_data();
-  //create_category_data();
-
-  //create_renhe_data();
-  // create_tianfu_data();
   create_horizontal_bar();
 });
 function handleClick() {
-  setTimeout(() => {
-    create_tianfu_data();
-  }, 2);
+  // setTimeout(() => {
+  //   create_tianfu_data();
+  // }, 2);
 }
 
-//setInterval(create_small_data, 60000);
-//setInterval(create_tow_data, 60000);
-//setInterval(create_category_data, 60000);
-setInterval(create_horizontal_bar, 60000);
-//setInterval(create_renhe_data, 60000);
-//setInterval(create_tianfu_data, 60000);
-//setInterval(getTianfuList(1), 60000);
-//setInterval(getRenheList(1), 60000);
+setInterval(create_horizontal_bar, 60 * 60 * 1000);
 // getTianfuList(1);
 // getRenheList(1);
 
@@ -2768,11 +2090,11 @@ onBeforeUnmount(() => {
     category_chart.dispose();
     category_chart = null;
   } */
-   window.removeEventListener("resize", horizontalBar.resize);
+  window.removeEventListener("resize", horizontalBar.resize);
   if (horizontalBar) {
     horizontalBar.dispose();
     horizontalBar = null;
-  } 
+  }
   // window.removeEventListener("resize", tianfu_chart.resize);
   // if (tianfu_chart) {
   //   tianfu_chart.dispose();
@@ -2807,7 +2129,7 @@ onBeforeUnmount(() => {
   width:12.8rem;
 } */
 .columns:nth-child(1) {
-  flex: 3;
+  flex: 4;
   /* width:2.5rem; */
 }
 .columns:nth-child(2) {

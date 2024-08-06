@@ -60,9 +60,9 @@
     import { ref } from "vue";
 
     const scoreItems = ref([
-        { item: "Item 1", percentage: 50 },
-        { item: "Item 2", percentage: 30 },
-        { item: "Item 3", percentage: 20 },
+        { item: "规则 1", percentage: 50 },
+        { item: "规则 2", percentage: 30 },
+        { item: "规则 3", percentage: 20 },
     ]);
 </script>
    

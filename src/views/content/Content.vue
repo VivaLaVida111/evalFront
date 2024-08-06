@@ -4,7 +4,7 @@
     <Header style="height: 8%;  background-color: #004B8C; " :icon="null">
       <!-- 系统名字 -->
       <template #title>
-        <span class="text-title">金牛区环境治理考评系统</span>
+        <span class="text-title">金牛区城乡环境综合治理体征监测系统</span>
       </template>
       <!-- 时间 -->
 
@@ -225,19 +225,19 @@ const menuList = [
     title: "扣分统计分析",
     to: "penaltyPoints",
     submenu: [
-      { icon: "", title: "街道1", to: "penaltyPoints", query:  "街道1" },
-      { icon: "", title: "街道2", to: "penaltyPoints", query: "街道2"  },
-      { icon: "", title: "街道3", to: "penaltyPoints", query: "街道3"  },
-      { icon: "", title: "街道4", to: "penaltyPoints", query: "街道4"  },
-      { icon: "", title: "街道5", to: "penaltyPoints", query: "街道5"  },
-      { icon: "", title: "街道6", to: "penaltyPoints", query: "街道6"  },
-      { icon: "", title: "街道7", to: "penaltyPoints", query: "街道7"  },
-      { icon: "", title: "街道8", to: "penaltyPoints", query: "街道8"  },
-      { icon: "", title: "街道9", to: "penaltyPoints", query: "街道9"  },
-      { icon: "", title: "街道10", to: "penaltyPoints", query: "街道10"  },
-      { icon: "", title: "街道11", to: "penaltyPoints", query: "街道11"  },
-      { icon: "", title: "街道12", to: "penaltyPoints", query: "街道12"  },
-      { icon: "", title: "街道13", to: "penaltyPoints", query: "街道13"  }
+      { icon: "", title: "抚琴街道", to: "penaltyPoints", query: "抚琴街道"  },
+      { icon: "", title: "西安路街道", to: "penaltyPoints", query: "西安路街道"  },
+      { icon: "", title: "驷马桥街道", to: "penaltyPoints", query: "驷马桥街道"  },
+      { icon: "", title: "荷花池街道", to: "penaltyPoints", query: "荷花池街道"  },
+      { icon: "", title: "五块石街道", to: "penaltyPoints", query: "五块石街道"  },
+      { icon: "", title: "九里堤街道", to: "penaltyPoints", query: "九里堤街道"  },
+      { icon: "", title: "营门口街道", to: "penaltyPoints", query: "营门口街道"  },
+      { icon: "", title: "茶店子街道", to: "penaltyPoints", query: "茶店子街道"  },
+      { icon: "", title: "金泉街道", to: "penaltyPoints", query:  "金泉街道" },
+      { icon: "", title: "沙河源街道", to: "penaltyPoints", query: "沙河源街道"  },
+      { icon: "", title: "天回镇街道", to: "penaltyPoints", query: "天回镇街道"  },
+      { icon: "", title: "西华街道", to: "penaltyPoints", query: "西华街道"  },
+      { icon: "", title: "凤凰山街道", to: "penaltyPoints", query: "凤凰山街道"  }
     ],
   },
 
