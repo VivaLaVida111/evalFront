@@ -175,6 +175,7 @@ import Charts from "@jiaminghi/charts";
 import { House, ArrowDown, Setting, Link } from "@element-plus/icons-vue";
 import Header from "@/components/Header.vue";
 import axios from "axios";
+import { params } from "@/store/store.js";
 
 // import { getFlows, getFlows_xihua } from "@/api/content.js";
 
@@ -1948,6 +1949,10 @@ const getScores = (startTime, endTime) => {
   return axios({
     url: URL,
     method: "get",
+    headers: {
+              Authorization: "Bearer" + params.token,
+              "Content-Type": " application/json",
+            }
   }).then(function (resp) {
     var data = resp.data.data;
     console.log("getScores: ", data);

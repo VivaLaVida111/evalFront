@@ -20,3 +20,10 @@ export function getCarsLocation() {
 
     })
 }
+export function getLogin(user) {
+    return request({
+        url: '/auth/login',
+        method: 'post',
+        data: user
+    })
+}

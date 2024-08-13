@@ -27,6 +27,8 @@ import zhCn from 'element-plus/es/locale/lang/zh-cn'
 import weekRange from 'date-picker-week-range'
 import DateWeekRange from 'date-week-range'
 import './assets/font/iconfont.css'
+import store from './store/index'
+import "./permission.js";
 
 
 
@@ -44,6 +46,7 @@ createApp(App)
         v: "4.0", //目前只支持4.0版本
         tk: "6ee41245f1a0d9acb64e891964a7738e"
     })
+    .use(store)
     .mount('#app')
     //挂载echarts
     .config.globalProperties.$echarts = echarts;

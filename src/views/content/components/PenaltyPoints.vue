@@ -128,6 +128,7 @@ import axios from "axios";
 import moment from "moment";
 import getDetails from "@/api/content";
 import { defineProps } from "vue";
+import { params } from "@/store/store.js";
 
 // ==========================================================================================================sunny
 // const props = defineProps({
@@ -247,6 +248,10 @@ const getPenaltyPoints = (startTime, endTime, pageNum) => {
   axios({
     url: URL,
     method: "get",
+    headers: {
+              Authorization: "Bearer" + params.token,
+              "Content-Type": " application/json",
+            },
   }).then(function (resp) {
     var data = resp.data.data;
     console.log("getPenaltyPoints: ", data);
