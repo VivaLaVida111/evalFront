@@ -62,14 +62,6 @@
 
           <div class="panel_footer"></div>
         </div>
-        <!-- <div class="panel line">
-          <h2>小站垃圾净重量</h2>
-
-          <div id="small_pie"></div>
-
-          <div class="panel_footer"></div>
-        </div> -->
-
         <!-- <div class="no">
           <div
             style="
@@ -94,33 +86,39 @@
             </ul>
           </div>
         </div> -->
-
-        <!-- <div class="panel line">
-          <h2>过去一周垃圾净重趋势</h2>
-
-          <div id="tow_pie"></div>
-
-          <div class="panel_footer"></div>
-        </div> -->
       </div>
       <div class="columns">
         <div class="no">
           <div class="no-hd">
             <ul>
-              <li>0</li>
-              <li>0</li>
-              <li>0</li>
-              <li>0</li>
-              <li>0</li>
+              <li
+                v-for="(rule, index) in bigRulesStatistics.slice(0, 5)"
+                :key="index"
+              >
+                {{ rule.score }}
+              </li>
+              <li
+                v-for="index in 5 - bigRulesStatistics.length"
+                :key="'empty-' + index"
+              >
+                0
+              </li>
             </ul>
           </div>
           <div class="no-bd">
             <ul>
-              <li>数据1</li>
-              <li>数据2</li>
-              <li>数据3</li>
-              <li>数据4</li>
-              <li>数据5</li>
+              <li
+                v-for="(rule, index) in bigRulesStatistics.slice(0, 5)"
+                :key="index"
+              >
+                {{ rule.item }}
+              </li>
+              <li
+                v-for="index in 5 - bigRulesStatistics.length"
+                :key="'empty-' + index"
+              >
+                数据{{ index + 1  }}
+              </li>
             </ul>
           </div>
         </div>
@@ -145,7 +143,26 @@
           </tdt-map>
         </div>
       </div>
-      <div class="columns"></div>
+      <div class="columns">
+        <!-- <div class="panel bar">
+          <h2>大规则统计</h2>
+          <div class="panel_footer">
+            <ul>
+              <li v-for="(rule, index) in bigRulesStatistics" :key="index">
+                <span>{{ rule.item }}</span
+                >: <span>{{ rule.score }}</span>
+              </li>
+            </ul>
+          </div>
+        </div> -->
+        <div class="panel bar">
+          <h2>大项规则扣分排名</h2>
+
+          <div id="horizontal_bar1"></div>
+
+          <div class="panel_footer"></div>
+        </div>
+      </div>
     </div>
   </body>
 </template>
@@ -176,8 +193,7 @@ import { House, ArrowDown, Setting, Link } from "@element-plus/icons-vue";
 import Header from "@/components/Header.vue";
 import axios from "axios";
 import { params } from "@/store/store.js";
-
-// import { getFlows, getFlows_xihua } from "@/api/content.js";
+import { getBigRulesStatistics } from "@/api/home.js";
 
 import moment from "moment";
 
@@ -1950,9 +1966,9 @@ const getScores = (startTime, endTime) => {
     url: URL,
     method: "get",
     headers: {
-              Authorization: "Bearer" + params.token,
-              "Content-Type": " application/json",
-            }
+      Authorization: "Bearer" + params.token,
+      "Content-Type": " application/json",
+    },
   }).then(function (resp) {
     var data = resp.data.data;
     console.log("getScores: ", data);
@@ -1993,6 +2009,9 @@ const horizontalOpt = {
   legend: {
     show: true,
   },
+  grid: {
+    left: "15%",
+  },
   animationDuration: 0,
   animationDurationUpdate: 3000,
   animationEasing: "linear",
@@ -2023,6 +2042,98 @@ const create_horizontal_bar = async () => {
     console.error("Failed to create horizontal bar chart:", error);
   }
 };
+
+//右侧的图
+const bigRulesStatistics = reactive([]);
+const bigRulsList = reactive([]);
+const demeritList = reactive([]);
+const getStatistics = (startTime, endTime) => {
+  var URL = "/api/details/bigRulesStatistics/" + startTime + "/" + endTime;
+  console.log("URL: ", URL);
+  return axios({
+    url: URL,
+    method: "get",
+    headers: {
+      Authorization: "Bearer" + params.token,
+      "Content-Type": " application/json",
+    },
+  }).then(function (resp) {
+    var data = resp.data.data;
+    console.log("getStatistics: ", data);
+    bigRulesStatistics.splice(0, bigRulesStatistics.length);
+    bigRulsList.splice(0, bigRulsList.length);
+    demeritList.splice(0, demeritList.length);
+    for (var key in data) {
+      bigRulesStatistics.push(data[key]);
+      bigRulsList.push(data[key].item);
+      demeritList.push(Math.abs(data[key].score));
+    }
+  });
+};
+
+const horizontalOpt1 = {
+  xAxis: {
+    max: "dataMax",
+  },
+  yAxis: {
+    type: "category",
+    data: bigRulsList,
+    inverse: true,
+    animationDuration: 300,
+    animationDurationUpdate: 300,
+    max: 13, // only the largest 3 bars will be displayed
+    
+  },
+  series: [
+    {
+      realtimeSort: true,
+      name: "大项规则",
+      type: "bar",
+      data: demeritList,
+      label: {
+        show: true,
+        position: "right",
+        valueAnimation: true,
+      },
+    },
+  ],
+  legend: {
+    show: true,
+  },
+  grid: {
+    left: "17%",
+  },
+  animationDuration: 0,
+  animationDurationUpdate: 3000,
+  animationEasing: "linear",
+  animationEasingUpdate: "linear",
+};
+
+let horizontalBar1 = null;
+const create_horizontal_bar1 = async () => {
+  try {
+    let chartDom = document.getElementById("horizontal_bar1");
+    //初始化图表
+    horizontalBar1 = echarts.init(chartDom);
+    // category_chart.on("click", (params) => {
+    //   console.log("params:" + params.data.name);
+    // });
+    // getScores修改了streetList和scoresList
+    await getStatistics(start, end);
+
+    console.log("bigRulsList: ", bigRulsList);
+    console.log("demeritList: ", demeritList);
+    horizontalOpt1.yAxis.data = bigRulsList;
+    horizontalOpt1.series[0].data = demeritList;
+    //绘制图表
+    horizontalBar1.setOption(horizontalOpt1);
+    //horizontalBar.resize();
+    window.addEventListener("resize", horizontalBar1.resize);
+  } catch (error) {
+    console.error("Failed to create horizontal bar chart:", error);
+  }
+};
+
 
 // ======================================================================================================sunny
 /**
@@ -2067,6 +2178,7 @@ function trim(ele) {
 //Dom挂载完毕，可以拿到组件渲染后的 DOM节点，展示图表
 onMounted(() => {
   create_horizontal_bar();
+  create_horizontal_bar1();
 });
 function handleClick() {
   // setTimeout(() => {
@@ -2075,6 +2187,7 @@ function handleClick() {
 }
 
 setInterval(create_horizontal_bar, 60 * 60 * 1000);
+setInterval(create_horizontal_bar1, 60 * 60 * 1000);
 // getTianfuList(1);
 // getRenheList(1);
 
@@ -2099,6 +2212,11 @@ onBeforeUnmount(() => {
   if (horizontalBar) {
     horizontalBar.dispose();
     horizontalBar = null;
+  }
+  window.removeEventListener("resize", horizontalBar1.resize);
+  if (horizontalBar1) {
+    horizontalBar1.dispose();
+    horizontalBar1 = null;
   }
   // window.removeEventListener("resize", tianfu_chart.resize);
   // if (tianfu_chart) {
@@ -2470,6 +2588,13 @@ li {
 }
 
 #horizontal_bar {
+  height: 9rem;
+  width: 100%;
+  /* margin-top: -7vh; */
+  opacity: 1;
+}
+
+#horizontal_bar1 {
   height: 9rem;
   width: 100%;
   /* margin-top: -7vh; */

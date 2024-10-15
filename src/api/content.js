@@ -23,76 +23,35 @@ export function getDetails(start, end, street) {
         method: 'get'
     })
 }
-export function getJinNniuToday(start,end,pageNum,pageSize) {
+
+export function getDetailRules() {
     return request({
-        url: '/dump-record/period/' + start + '/'+end,
-        method: 'get',
-        // data: {
-        //     pageNum: pageNum,
-        //     pageSize: pageSize		//user_id为接口请求关键字,7为参数值
-        // }
-    })
-}
-export function getQuery(site_name, transporter, start, end, pageNum, pageSize) {
-    return request({
-        url: '/dump-record/page/' + site_name + '/' + transporter + '/' + start + '/' + end + '/' + pageNum + '/' + pageSize,
-        method: 'get',
-        // params: {
-        //     pageNum: pageNum,
-        //     pageSize: pageSize		//user_id为接口请求关键字,7为参数值
-        // }
-    })
-}
-export function getCarGps(car_number,start,end){
-    return request({
-        url: '/gps-record/track/'+car_number+'/'+start+'/'+end,
-        method: 'get'
-    })
-}
-export function getCars(){
-    return request({
-        url: '/car',
+        url: '/big-rules/getDetailRules',
         method: 'get'
     })
 }
 
-export function getAllGps(){
+export function getSelfRoles() {
     return request({
-        url: '/gps-record/latest_location/all'+'/',
+        url: '/auth/self_role_list',
         method: 'get'
     })
 }
 
-
-// 车辆倾倒数据查询;若需全部站点数据,则site_name填all
-export function getTransportCars(start, end,site_name, pageNum, pageSize) {
+export function addSubdivision(data) {
     return request({
-        url: '/dump-record/dump_car/' + start + '/' + end + '/' + site_name + '/' + pageNum + '/' + pageSize,
-        method: 'get',
-        // params: {
-        //     pageNum: pageNum,
-        //     pageSize: pageSize		//user_id为接口请求关键字,7为参数值
-        // }
+        url: '/details/add',
+        method: 'post',
+        data
     })
 }
-
-export function getAllGp(){
-    return request({
-        url: '/gps-record/latest_location/all'+'/',
-        method: 'get'
-    })
+export function formatLocalDateTime() {
+    const date = new Date();
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const seconds = String(date.getSeconds()).padStart(2, '0');
+    return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
 }
-
-// export function getFlows() {
-//         return request({
-//           url: "/OsmoticFluid/shenlvye/getRecord",
-//           method: "get",
-//         });
-// }
-
-// export function getFlows_xihua() {
-//         return request({
-//           url: "/OsmoticFluid/shenlvye/getRecordByStation?station=xihua",
-//           method: "get",
-//         });
-// }

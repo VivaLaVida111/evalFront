@@ -103,19 +103,20 @@ const login = () => {
   getLogin(user).then((data) => {
     if (data.error_message == "success") {
       console.log("检验密码：" + data.isValidPassword);
-      if (data.isValidPassword == "false") {
-        ElMessage({
-          message: h("p", null, [
-            h("span", null, "您的密码为初始密码，为保证登录安全请重设密码！"),
-          ]),
-          type: "error",
-        });
-        params.token = data.token;
-        setToken(data.token);
+      // if (data.isValidPassword == "false") {
+      //   ElMessage({
+      //     message: h("p", null, [
+      //       h("span", null, "您的密码为初始密码，为保证登录安全请重设密码！"),
+      //     ]),
+      //     type: "error",
+      //   });
+      //   params.token = data.token;
+      //   setToken(data.token);
 
-        router.push("/changepsw");
-        localStorage.setItem("username", params.username);
-      } else {
+      //   router.push("/changepsw");
+      //   localStorage.setItem("username", params.username);
+      // } 
+      //else {
         if (rememberUser.value == true) {
           localStorage.setItem("username", params.username);
           localStorage.setItem("password", params.password);
@@ -145,7 +146,7 @@ const login = () => {
         //console.log(data.role_id)
         router.push({ name: "map" });
         localStorage.setItem("username", params.username);
-      }
+      //}
     } else {
       ElMessage({
         message: h("p", null, [h("span", null, data.error_message)]),

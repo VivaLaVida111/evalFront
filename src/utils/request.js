@@ -14,7 +14,7 @@ service.interceptors.request.use(
       // 修改请求头
       config.headers = {
         ...config.headers, // 展开现有的headers属性
-        Authorization: `Bearer ${params.token}`, // 添加或覆盖Authorization头
+        Authorization: `Bearer${params.token}`, // 添加或覆盖Authorization头
         "Content-Type": "application/json", // 添加或覆盖Content-Type头
       };
     }

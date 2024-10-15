@@ -27,3 +27,9 @@ export function getLogin(user) {
         data: user
     })
 }
+export function getBigRulesStatistics(start, end) {
+    return request({
+        url: '/details/bigRulesStatistics/' + start + '/' + end,
+        method: 'get'
+    })
+}

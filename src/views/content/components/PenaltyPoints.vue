@@ -126,7 +126,7 @@ import { ref, reactive, computed, watch } from "vue";
 //===============================================================================================================
 import axios from "axios";
 import moment from "moment";
-import getDetails from "@/api/content";
+import getDetails from "@/api/content.js";
 import { defineProps } from "vue";
 import { params } from "@/store/store.js";
 
