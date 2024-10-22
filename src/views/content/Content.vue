@@ -74,7 +74,7 @@
             </template>
             <template v-else>
               <el-menu-item
-                :index="idx"
+                :index="idx + ''"
                 :key="idx"
                 @click="displayContent(item.to)"
               >

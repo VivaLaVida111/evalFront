@@ -6,7 +6,7 @@
       </h5>
     </el-header>
     <el-main>
-      <el-form ref="form" :model="form" label-width="80px">
+      <el-form ref="form" :model="formData" label-width="80px">
         <el-form-item label="街道">
           <el-select placeholder="选择街道" clearable v-model="formData.street">
             <el-option
@@ -107,7 +107,6 @@ const filteredDetailRules = computed(() => {
   );
 });
 
-
 const formData = reactive({
   street: "",
   bigRulesId: null,
@@ -144,7 +143,43 @@ function onBigRulesChange(selectedBigRuleId) {
   }
 }
 
+function validateFormData() {
+  if (!formData.street) {
+    ElMessage({
+      message: "请选择街道",
+      type: "error",
+    });
+    return false;
+  }
+  if (!formData.bigRulesId) {
+    ElMessage({
+      message: "请选择大规则",
+      type: "error",
+    });
+    return false;
+  }
+  if (!formData.smallRulesId) {
+    ElMessage({
+      message: "请选择小规则",
+      type: "error",
+    });
+    return false;
+  }
+  
+  if (formData.subtotal === null || formData.subtotal === undefined || formData.subtotal === 0) {
+    ElMessage({
+      message: "请填写加减分值",
+      type: "error",
+    });
+    return false;
+  }
+  return true;
+}
+
 function submitForm() {
+  if (!validateFormData()) {
+    return;
+  }
   formData.time = formatLocalDateTime();
   console.log("Form submitted:", formData);
   addSubdivision(formData).then((data) => {

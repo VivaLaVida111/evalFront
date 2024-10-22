@@ -29,7 +29,6 @@
         start-placeholder="选择开始时间"
         end-placeholder="选择结束时间"
         :disabled-date="disabledDate"
-        :shortcuts="shortcuts"
         @change="changeDate"
         size="large"
         style="margin: 0.5rem 0 0.5rem"

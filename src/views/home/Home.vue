@@ -29,7 +29,7 @@
             link
             color="fff"
             @click="toHome"
-            size="0.25rem"
+            size=""
             >前往数据主页</el-button
           >
         </div>
@@ -2068,6 +2068,7 @@ const getStatistics = (startTime, endTime) => {
       bigRulsList.push(data[key].item);
       demeritList.push(Math.abs(data[key].score));
     }
+    //console.log("bigRulesStatistics: ", bigRulesStatistics);
   });
 };
 
