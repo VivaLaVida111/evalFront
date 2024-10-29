@@ -53,6 +53,18 @@
           size="large"
           class="data-table"
         >
+          <!-- 序号列 -->
+          <el-table-column
+            label="序号"
+            min-width="50"
+            header-align="center"
+            align="center"
+          >
+            <template #default="{ $index }">
+              <span>{{ $index + 1 }}</span>
+            </template>
+          </el-table-column>
+          <!-- 小规则项列 -->
           <el-table-column
             label="小规则项"
             min-width="150"
@@ -61,7 +73,7 @@
             :show-overflow-tooltip="true"
           >
             <template #default="{ row }">
-              <span>{{ row.item }}</span>
+              <span class="long-text">{{ row.item }}</span>
             </template>
           </el-table-column>
         </el-table>
@@ -96,5 +108,9 @@ const toggle = (rule) => {
 /* 确保 el-dialog 没有被隐藏或覆盖 */
 .el-dialog {
   z-index: 9999 !important;
+}
+.long-text {
+  white-space: pre-wrap;
+  word-break: break-word;
 }
 </style>

@@ -35,7 +35,7 @@
       />
       <router-view :key="$route.fullPath">
         <el-table
-          :data="detailsList.slice((currentPage - 1) * 8, currentPage * 8)"
+          :data="detailsList"
           style="width: 100%"
           size="large"
           class="data-table"
@@ -239,11 +239,11 @@ function changeDate() {
 const getPenaltyPoints = (startTime, endTime, pageNum) => {
   var URL = "/api/details/period/";
   if (street.value === "") {
-    URL += startTime + "/" + endTime;
+    URL += startTime + "/" + endTime + "/" + pageNum + "/8";
   } else {
-    URL += startTime + "/" + endTime + "?street=" + street.value;
+    URL += startTime + "/" + endTime + "/" + pageNum + "/8" + "?street=" + street.value;
   }
-  console.log("URL: ", URL);
+  //console.log("URL: ", URL);
   axios({
     url: URL,
     method: "get",
@@ -252,9 +252,10 @@ const getPenaltyPoints = (startTime, endTime, pageNum) => {
               "Content-Type": " application/json",
             },
   }).then(function (resp) {
-    var data = resp.data.data;
-    console.log("getPenaltyPoints: ", data);
+    var result = resp.data.data;
+    console.log("getPenaltyPoints: ", result);
     detailsList.splice(0, detailsList.length);
+    var data = result.records;
     for (var key in data) {
       var detail = null;
       if (data[key].id === null) {
@@ -279,7 +280,7 @@ const getPenaltyPoints = (startTime, endTime, pageNum) => {
       }
       detailsList.push(detail);
     }
-    totalRecords.value = detailsList.length;
+    totalRecords.value = result.total;
     currentPage.value = pageNum;
   });
 };
@@ -292,7 +293,10 @@ watch(route, (to, from) => {
 
 const getTransport = (pageNum) => {
   // 当前页
-  currentPage.value = pageNum;
+  //currentPage.value = pageNum;
+  var start = moment(changeValue.value[0]).format("YYYY-MM-DD") + "T00:00:00";
+  var end = moment(changeValue.value[1]).format("YYYY-MM-DD") + "T23:59:59";
+  getPenaltyPoints(start, end, pageNum);
 };
 
 function upDateList() {

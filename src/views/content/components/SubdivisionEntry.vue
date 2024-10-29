@@ -9,12 +9,17 @@
       <el-form ref="form" :model="formData" label-width="80px">
         <el-form-item label="街道">
           <el-select placeholder="选择街道" clearable v-model="formData.street">
-            <el-option
-              v-for="street in streets"
-              :key="street.value"
-              :label="street.label"
-              :value="street.value"
-            />
+            <template v-if="streets && streets.length > 0">
+              <el-option
+                v-for="street in streets"
+                :key="street.value"
+                :label="street.label"
+                :value="street.value"
+              />
+            </template>
+            <template v-else>
+              <el-empty description="无效" />
+            </template>
           </el-select>
         </el-form-item>
         <el-form-item label="大规则">
@@ -24,12 +29,17 @@
             v-model="formData.bigRulesId"
             @change="onBigRulesChange"
           >
-            <el-option
-              v-for="(rule, index) in filteredDetailRules"
-              :key="index"
-              :label="rule.bigRules.item"
-              :value="rule.bigRules.id"
-            />
+            <template v-if="filteredDetailRules != null && filteredDetailRules != undefined && filteredDetailRules.length > 0">
+              <el-option
+                v-for="(rule, index) in filteredDetailRules"
+                :key="index"
+                :label="rule.bigRules.item"
+                :value="rule.bigRules.id"
+              />
+            </template>
+            <template v-else>
+              <el-empty description="无效" />
+            </template>
           </el-select>
         </el-form-item>
         <el-form-item label="小规则">
@@ -38,12 +48,17 @@
             clearable
             v-model="formData.smallRulesId"
           >
-            <el-option
-              v-for="(smallRule, index) in smallRules"
-              :key="index"
-              :label="smallRule.item"
-              :value="smallRule.id"
-            />
+            <template v-if="smallRules && smallRules.length > 0">
+              <el-option
+                v-for="(smallRule, index) in smallRules"
+                :key="index"
+                :label="smallRule.item"
+                :value="smallRule.id"
+              />
+            </template>
+            <template v-else>
+              <el-empty description="无效" />
+            </template>
           </el-select>
         </el-form-item>
         <el-form-item label="备注">
@@ -56,7 +71,7 @@
         <el-form-item label="加减分值">
           <el-input-number
             v-model="formData.subtotal"
-            step="0.1"
+            :step="0.1"
           ></el-input-number>
         </el-form-item>
         <el-form-item>
