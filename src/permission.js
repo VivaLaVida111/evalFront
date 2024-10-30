@@ -1,5 +1,5 @@
 import router from "@/router";
-import { getToken, removeToken, removeHwzyToken } from "@/composables/auth";
+import { getToken, removeToken } from "@/composables/auth";
 import store from "@/store/index.js";
 import { setToken } from "@/composables/auth";
 import { params } from "@/store/store.js";
@@ -30,7 +30,6 @@ router.beforeEach(async (to, from, next) => {
   if (token && to.path == "/login") {
     router.push("/login");
     removeToken();
-    removeHwzyToken();
   }
 
   if (token) {

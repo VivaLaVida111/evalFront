@@ -52,7 +52,7 @@ import { params } from "@/store/store.js";
 import { getLogin } from "@/api/home.js";
 
 // import { useCookies } from '@vueuse/integrations/useCookies'
-import { setToken, setHwzyToken } from "@/composables/auth";
+import { setToken } from "@/composables/auth";
 import { useStore } from "vuex";
 
 const store = useStore();
@@ -123,26 +123,13 @@ const login = () => {
         }
         params.isLogin = true;
         params.token = data.token;
-        params.roleId = data.role_id;
-        params.hwzyToken = data.hwzyToken;
-        console.log(11111, params.hwzyToken);
-
-        // getHwzyToken().then((data) => {
-        // params.hwzyToken = data.access_token;
-        // console.log(418,params.hwzyToken)
-        // });
+        params.role = data.roles;
 
         //将token存储到cookie里面
         // const cookie = useCookies();
         // cookie.set("token",data.token);
         setToken(data.token);
-        setHwzyToken(data.hwzyToken);
 
-        if (data.role_id.includes("83")) {
-          params.role = "管理员";
-        } else {
-          params.role = "";
-        }
         //console.log(data.role_id)
         router.push({ name: "map" });
         localStorage.setItem("username", params.username);

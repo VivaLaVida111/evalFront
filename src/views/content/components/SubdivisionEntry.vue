@@ -6,75 +6,64 @@
       </h5>
     </el-header>
     <el-main>
-      <el-form ref="form" :model="formData" label-width="80px">
+      <el-form ref="form" :model="localFormData" label-width="80px">
         <el-form-item label="街道">
-          <el-select placeholder="选择街道" clearable v-model="formData.street">
-            <template v-if="streets && streets.length > 0">
-              <el-option
-                v-for="street in streets"
-                :key="street.value"
-                :label="street.label"
-                :value="street.value"
-              />
-            </template>
-            <template v-else>
-              <el-empty description="无效" />
-            </template>
+          <el-select
+            placeholder="选择街道"
+            clearable
+            v-model="localFormData.street"
+          >
+            <el-option
+              v-for="street in streets"
+              :key="street.value"
+              :label="street.label"
+              :value="street.value"
+            />
           </el-select>
         </el-form-item>
         <el-form-item label="大规则">
           <el-select
             placeholder="选择大规则"
             clearable
-            v-model="formData.bigRulesId"
+            v-model="localFormData.bigRulesId"
             @change="onBigRulesChange"
           >
-            <template v-if="filteredDetailRules != null && filteredDetailRules != undefined && filteredDetailRules.length > 0">
-              <el-option
-                v-for="(rule, index) in filteredDetailRules"
-                :key="index"
-                :label="rule.bigRules.item"
-                :value="rule.bigRules.id"
-              />
-            </template>
-            <template v-else>
-              <el-empty description="无效" />
-            </template>
+            <el-option
+              v-for="(rule, index) in filteredDetailRules"
+              :key="index"
+              :label="rule.bigRules.item"
+              :value="rule.bigRules.id"
+            />
           </el-select>
         </el-form-item>
         <el-form-item label="小规则">
           <el-select
             placeholder="选择小规则"
             clearable
-            v-model="formData.smallRulesId"
+            v-model="localFormData.smallRulesId"
           >
-            <template v-if="smallRules && smallRules.length > 0">
-              <el-option
-                v-for="(smallRule, index) in smallRules"
-                :key="index"
-                :label="smallRule.item"
-                :value="smallRule.id"
-              />
-            </template>
-            <template v-else>
-              <el-empty description="无效" />
-            </template>
+            <el-option
+              v-for="(smallRule, index) in smallRules"
+              :key="index"
+              :label="smallRule.item"
+              :value="smallRule.id"
+            />
           </el-select>
         </el-form-item>
         <el-form-item label="备注">
           <el-input
-            v-model="formData.remark"
+            v-model="localFormData.remark"
             style="width: 1000px"
             type="textarea"
           ></el-input>
         </el-form-item>
         <el-form-item label="加减分值">
           <el-input-number
-            v-model="formData.subtotal"
+            v-model="localFormData.subtotal"
             :step="0.1"
           ></el-input-number>
         </el-form-item>
-        <el-form-item>
+        <el-form-item v-if="localSubmitVisible">
           <el-button type="primary" @click="submitForm">提交</el-button>
         </el-form-item>
       </el-form>
@@ -83,52 +72,64 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed } from "vue";
+import { ref, reactive, computed, watch } from "vue";
 import {
   getDetailRules,
   addSubdivision,
   formatLocalDateTime,
-  getSelfRoles
 } from "@/api/content.js";
 import { ElMessage } from "element-plus";
+import { params } from "@/store/store.js";
+
+const props = defineProps({
+  formData: {
+    type: Object,
+    default: () => ({
+      street: "",
+      bigRulesId: null,
+      smallRulesId: null,
+      remark: "",
+      subtotal: 0,
+      time: "",
+    }),
+  },
+  submitVisible: {
+    type: Boolean,
+    default: true,
+  },
+});
+
+const localFormData = reactive({ ...props.formData });
+const localSubmitVisible = ref(props.submitVisible);
+
+watch(
+  () => props.formData,
+  (newVal) => {
+    Object.assign(localFormData, newVal);
+  },
+  { deep: true }
+);
+
+watch(
+  () => props.submitVisible,
+  (newVal) => {
+    localSubmitVisible.value = newVal;
+  }
+);
 
 const detailRules = ref([]);
-const userRoles = ref([]);
+
 getDetailRules().then((data) => {
   detailRules.value = data;
 });
 
-getSelfRoles().then((data) => {
-  console.log("Roles data:", JSON.stringify(data));
-  data = data[0];
-  if (data.roleList && Array.isArray(data.roleList)) {
-    if (data.roleList.some(role => role.name === "管理者")) {
-      userRoles.value = ["管理者"];
-    } else {
-      userRoles.value = data.roleList.map(role => role.name);
-    }
-  } else {
-    console.error("Invalid roleList data:", data.roleList);
-  }
-  console.log("User roles:", userRoles.value);
-});
-
 const filteredDetailRules = computed(() => {
-  if (userRoles.value.includes("管理者")) {
+  if (params.role.includes("管理者")) {
     return detailRules.value;
   }
-  return detailRules.value.filter(rule =>
-    userRoles.value.includes(rule.bigRules.item)
+  return detailRules.value.filter((rule) =>
+    params.role.includes(rule.bigRules.item)
   );
-});
-
-const formData = reactive({
-  street: "",
-  bigRulesId: null,
-  smallRulesId: null,
-  remark: "",
-  subtotal: 0,
-  time: "",
 });
 
 const streets = ref([
@@ -147,41 +148,50 @@ const streets = ref([
   { label: "凤凰山街道", value: "凤凰山街道" },
 ]);
 
-const smallRules = ref([]);
-
-function onBigRulesChange(selectedBigRuleId) {
-  const selectedRule = filteredDetailRules.value.find(rule => rule.bigRules.id === selectedBigRuleId);
-  if (selectedRule) {
-    smallRules.value = selectedRule.smallRules;
-  } else {
-    smallRules.value = [];
+const smallRules = computed(() => {
+  if (localFormData.bigRulesId !== null) {
+    const selectedRule = filteredDetailRules.value.find(
+      (rule) => rule.bigRules.id === localFormData.bigRulesId
+    );
+    if (selectedRule) {
+      return selectedRule.smallRules;
+    }
   }
+  return [];
+});
+
+function onBigRulesChange() {
+  localFormData.smallRulesId = null;
 }
 
 function validateFormData() {
-  if (!formData.street) {
+  if (!localFormData.street) {
     ElMessage({
       message: "请选择街道",
       type: "error",
     });
     return false;
   }
-  if (!formData.bigRulesId) {
+  if (!localFormData.bigRulesId) {
     ElMessage({
       message: "请选择大规则",
       type: "error",
     });
     return false;
   }
-  if (!formData.smallRulesId) {
+  if (!localFormData.smallRulesId) {
     ElMessage({
       message: "请选择小规则",
       type: "error",
     });
     return false;
   }
-  
-  if (formData.subtotal === null || formData.subtotal === undefined || formData.subtotal === 0) {
+
+  if (
+    localFormData.subtotal === null ||
+    localFormData.subtotal === undefined ||
+    localFormData.subtotal === 0
+  ) {
     ElMessage({
       message: "请填写加减分值",
       type: "error",
@@ -191,18 +201,28 @@ function validateFormData() {
   return true;
 }
 
+function resetFormData() {
+  localFormData.street = "";
+  localFormData.bigRulesId = null;
+  localFormData.smallRulesId = null;
+  localFormData.remark = "";
+  localFormData.subtotal = 0;
+  localFormData.time = "";
+}
+
 function submitForm() {
   if (!validateFormData()) {
     return;
   }
-  formData.time = formatLocalDateTime();
-  console.log("Form submitted:", formData);
-  addSubdivision(formData).then((data) => {
+  localFormData.time = formatLocalDateTime();
+  console.log("Form submitted:", localFormData);
+  addSubdivision(localFormData).then((data) => {
     if (data) {
       ElMessage({
         message: "提交成功",
         type: "success",
       });
+      resetFormData(); // 重置表单数据
     } else {
       ElMessage({
         message: "提交失败",

@@ -7,5 +7,4 @@ export const params = reactive({
     isLogin: false,
     roleId: "",
     realname: "",
-    hwzyToken:"",
 })

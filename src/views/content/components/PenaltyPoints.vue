@@ -6,21 +6,6 @@
       </h5>
     </el-header>
     <el-main>
-      <!-- <el-select
-          v-model="site_name_select_way"
-          class="m-2"
-          placeholder="选择街道"
-          @change="changeDate"
-          clearable
-          size="large"
-        >
-          <el-option
-            v-for="item in street_name_option"
-            :key="item.value"
-            :label="item.label"
-            :value="item.value"
-          />
-        </el-select> -->
       <el-date-picker
         v-model="changeValue"
         type="daterange"
@@ -43,7 +28,7 @@
           <el-table-column
             prop="street"
             label="街道"
-            min-width="150"
+            min-width="131"
             header-align="center"
             align="center"
             :show-overflow-tooltip="true"
@@ -52,7 +37,7 @@
           <el-table-column
             prop="big_rules"
             label="大项规则"
-            min-width="150"
+            min-width="131"
             header-align="center"
             align="center"
             :show-overflow-tooltip="true"
@@ -61,7 +46,7 @@
           <el-table-column
             prop="big_rules_percentage"
             label="大项占比"
-            min-width="150"
+            min-width="75"
             header-align="center"
             align="center"
             :show-overflow-tooltip="true"
@@ -70,7 +55,7 @@
           <el-table-column
             prop="small_rules"
             label="小项规则"
-            min-width="150"
+            min-width="131"
             header-align="center"
             align="center"
             :show-overflow-tooltip="true"
@@ -78,7 +63,7 @@
           <el-table-column
             prop="small_rules_percentage"
             label="小项占比"
-            min-width="150"
+            min-width="75"
             header-align="center"
             align="center"
             :show-overflow-tooltip="true"
@@ -87,7 +72,7 @@
           <el-table-column
             prop="subtotal"
             label="小计"
-            min-width="150"
+            min-width="75"
             header-align="center"
             align="center"
             :show-overflow-tooltip="true"
@@ -96,11 +81,28 @@
           <el-table-column
             prop="time"
             label="时间"
-            min-width="150"
+            min-width="131"
             header-align="center"
             align="center"
             :show-overflow-tooltip="true"
           >
+          </el-table-column>
+          <!-- 操作列 -->
+          <el-table-column
+            label="操作"
+            min-width="100"
+            header-align="center"
+            align="center"
+          >
+            <template #default="{ row, $index }">
+              <el-button
+                v-if="canEdit(row.big_rules)"
+                type="primary"
+                @click="editRecord(row, $index)"
+              >
+                编辑
+              </el-button>
+            </template>
           </el-table-column>
         </el-table>
       </router-view>
@@ -115,28 +117,32 @@
         />
       </div>
     </el-main>
+    <!-- 编辑对话框 -->
+    <el-dialog title="编辑记录" v-model="dialogVisible" width="50%">
+      <div>
+        <SubdivisionEntry :formData="formData" :submitVisible="false"/>
+      </div>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="dialogVisible = false">取消</el-button>
+        <el-button type="primary" @click="confirmEdit(formData)">确认</el-button> 
+        <el-button type="danger" @click="deleteRecord(formData)">删除</el-button>
+      </span>
+    </el-dialog>
   </el-container>
 </template>
 
 <script setup>
-import { useRouter, useRoute } from "vue-router";
-// ==========================================================================================================sunny
 import { ref, reactive, computed, watch } from "vue";
-//===============================================================================================================
 import axios from "axios";
 import moment from "moment";
-import getDetails from "@/api/content.js";
-import { defineProps } from "vue";
+import { useRoute } from "vue-router";
 import { params } from "@/store/store.js";
-
-// ==========================================================================================================sunny
-// const props = defineProps({
-// street: String
-// });
+import SubdivisionEntry from './SubdivisionEntry.vue';
 
 function isEmptyObject(obj) {
   return Object.keys(obj).length === 0;
 }
+
 const route = useRoute();
 const street = computed(() => {
   return isEmptyObject(route.query) ? "" : route.query.street;
@@ -144,73 +150,12 @@ const street = computed(() => {
 
 let totalRecords = ref(1000);
 let currentPage = ref(1);
-// 禁选今天以后的日期以及没有数据的
 const disabledDate = (time) => {
   return (
     time.getTime() < new Date("2022-03-12").getTime() ||
     time.getTime() > new Date().getTime()
   );
 };
-const queryCarNum = ref("");
-const querySitename = ref("");
-let site_name_select_way = ref("所有站点");
-
-const street_name_option = [
-  {
-    value: "街道1",
-    label: "街道1",
-  },
-  {
-    value: "街道2",
-    label: "街道2",
-  },
-  {
-    value: "街道3",
-    label: "街道3",
-  },
-  {
-    value: "街道4",
-    label: "街道4",
-  },
-  {
-    value: "街道5",
-    label: "街道5",
-  },
-  {
-    value: "街道6",
-    label: "街道6",
-  },
-  {
-    value: "街道7",
-    label: "街道7",
-  },
-  {
-    value: "街道8",
-    label: "街道8",
-  },
-  {
-    value: "街道9",
-    label: "街道9",
-  },
-  {
-    value: "街道10",
-    label: "街道10",
-  },
-  {
-    value: "街道11",
-    label: "街道11",
-  },
-  {
-    value: "街道12",
-    label: "街道12",
-  },
-  {
-    value: "街道13",
-    label: "街道13",
-  },
-];
-
-//=============================================================
 
 const transport_today =
   new Date().getFullYear() +
@@ -227,12 +172,22 @@ const today = moment().format("YYYY-MM-DD");
 const firstDayOfMonth = moment().startOf("month").format("YYYY-MM-DD");
 let changeValue = ref([firstDayOfMonth, today]);
 const detailsList = reactive([]);
+const dialogVisible = ref(false);
+const currentIndex = ref(-1);
+const currentRecord = reactive({});
+const formData = reactive({
+  id: null,
+  street: "",
+  bigRulesId: null,
+  smallRulesId: null,
+  remark: "",
+  subtotal: 0,
+  time: "",
+});
+
 function changeDate() {
   var start = moment(changeValue.value[0]).format("YYYY-MM-DD") + "T00:00:00";
   var end = moment(changeValue.value[1]).format("YYYY-MM-DD") + "T23:59:59";
-  console.log(333, end);
-
-  // end =  new Date();
   getPenaltyPoints(start, end, 1);
 }
 
@@ -241,16 +196,23 @@ const getPenaltyPoints = (startTime, endTime, pageNum) => {
   if (street.value === "") {
     URL += startTime + "/" + endTime + "/" + pageNum + "/8";
   } else {
-    URL += startTime + "/" + endTime + "/" + pageNum + "/8" + "?street=" + street.value;
+    URL +=
+      startTime +
+      "/" +
+      endTime +
+      "/" +
+      pageNum +
+      "/8" +
+      "?street=" +
+      street.value;
   }
-  //console.log("URL: ", URL);
   axios({
     url: URL,
     method: "get",
     headers: {
-              Authorization: "Bearer" + params.token,
-              "Content-Type": " application/json",
-            },
+      Authorization: "Bearer" + params.token,
+      "Content-Type": " application/json",
+    },
   }).then(function (resp) {
     var result = resp.data.data;
     console.log("getPenaltyPoints: ", result);
@@ -260,6 +222,7 @@ const getPenaltyPoints = (startTime, endTime, pageNum) => {
       var detail = null;
       if (data[key].id === null) {
         var detail = {
+          id: null,
           big_rules: null,
           big_rules_percentage: null,
           small_rules: null,
@@ -269,11 +232,14 @@ const getPenaltyPoints = (startTime, endTime, pageNum) => {
         };
       } else {
         var detail = {
+          id: data[key].id,
           street: data[key].street,
           big_rules: data[key].bigRules.item,
           big_rules_percentage: data[key].bigRules.percentage,
+          big_rules_id: data[key].bigRules.id,
           small_rules: data[key].smallRules.item,
           small_rules_percentage: data[key].smallRules.percentage,
+          small_rules_id: data[key].smallRules.id,
           subtotal: data[key].subtotal,
           time: data[key].time,
         };
@@ -292,40 +258,54 @@ watch(route, (to, from) => {
 });
 
 const getTransport = (pageNum) => {
-  // 当前页
-  //currentPage.value = pageNum;
   var start = moment(changeValue.value[0]).format("YYYY-MM-DD") + "T00:00:00";
   var end = moment(changeValue.value[1]).format("YYYY-MM-DD") + "T23:59:59";
   getPenaltyPoints(start, end, pageNum);
 };
 
-function upDateList() {
-  var time = new Date().getTime();
-  // 获取当前时间，转化时间戳为正常格式
-  var end =
-    new Date().getHours().toString().padStart(2, 0) +
-    ":" +
-    new Date().getMinutes().toString().padStart(2, 0) +
-    ":" +
-    new Date().getSeconds().toString().padStart(2, 0);
-
-  var start =
-    new Date(time - 4 * 60 * 60 * 1000).getHours().toString().padStart(2, 0) +
-    ":" +
-    new Date(time - 4 * 60 * 60 * 1000).getMinutes().toString().padStart(2, 0) +
-    ":" +
-    new Date(time - 4 * 60 * 60 * 1000).getSeconds().toString().padStart(2, 0);
-
-  if (queryCarNum.value == "" || queryCarNum.value == "全部") {
-    // getCarWarning(start, end, 1, 10000);
-  } else {
-    searchCarWarning(queryCarNum.value, start, end);
-  }
-  // getLessCarWarning(start, end, 1, 10000);
+function canEdit(bigRules) {
+  return params.role.includes(bigRules) || params.role.includes("管理者");
 }
 
-upDateList();
-// 每隔一分钟更新一次
-setInterval(upDateList, 60000);
+function resetFormData() {
+  formData.id = null;
+  formData.street = "";
+  formData.bigRulesId = null;
+  formData.smallRulesId = null;
+  formData.remark = "";
+  formData.subtotal = 0;
+  formData.time = "";
+}
+
+function editRecord(record, index) {
+  currentIndex.value = index;
+  formData.id = record.id;
+  formData.street = record.street;
+  formData.bigRulesId = record.big_rules_id;
+  formData.smallRulesId = record.small_rules_id;
+  formData.remark = record.remark;
+  formData.subtotal = record.subtotal;
+  dialogVisible.value = true;
+}
+
+function confirmEdit(formData) {
+  // 处理确认编辑逻辑
+  detailsList.splice(currentIndex.value, 1, formData);
+  dialogVisible.value = false;
+  resetFormData();
+}
+
+function deleteRecord(formData) {
+  // 处理删除逻辑
+  //console.log("Deleting record with id:", id);
+  detailsList.splice(currentIndex.value, 1);
+  dialogVisible.value = false;
+  resetFormData();
+}
 </script>
-<style></style>
+
+<style scoped>
+.data-table .el-tooltip {
+  white-space: pre-wrap;
+}
+</style>
