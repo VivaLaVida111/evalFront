@@ -45,6 +45,23 @@ export function addSubdivision(data) {
         data
     })
 }
+
+export function deleteSubdivision(data) {
+    return request({
+        url: '/details/delete',
+        method: 'post',
+        data
+    })
+}
+
+export function updateSubdivision(data) { 
+    return request({
+        url: '/details/update',
+        method: 'post',
+        data
+    })
+}
+
 export function formatLocalDateTime() {
     const date = new Date();
     const year = date.getFullYear();

@@ -2,7 +2,7 @@
   <el-container>
     <el-header style="font-size: 25px; padding: 5px">
       <h5 class="card-title" style="font-size: 30px; padding: 5px">
-        扣分项录入
+        考评分数录入
       </h5>
     </el-header>
     <el-main>
@@ -37,18 +37,15 @@
           </el-select>
         </el-form-item>
         <el-form-item label="小规则">
-          <el-select
-            placeholder="选择小规则"
-            clearable
-            v-model="localFormData.smallRulesId"
-          >
-            <el-option
+          <el-radio-group v-model="localFormData.smallRulesId">
+            <el-radio
               v-for="(smallRule, index) in smallRules"
               :key="index"
-              :label="smallRule.item"
-              :value="smallRule.id"
-            />
-          </el-select>
+              :label="smallRule.id"
+            >
+              {{ smallRule.item }}
+            </el-radio>
+          </el-radio-group>
         </el-form-item>
         <el-form-item label="备注">
           <el-input

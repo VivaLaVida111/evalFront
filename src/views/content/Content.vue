@@ -243,7 +243,7 @@ const menuList = [
 
   // { icon: '03,16', title: '垃圾预测', to: 'qdkq', submenu: [] },
   { icon: "03,17", title: "评分规则", to: "ruleConfig", submenu: [] },
-  { icon: "03,17", title: "扣分项录入", to: "subdivisionEntry", submenu: [] },
+  { icon: "03,17", title: "考评分数录入", to: "subdivisionEntry", submenu: [] },
   /* { icon: "01,16", title: "车辆轨迹分析", to: "carRecord", submenu: [] },
   { icon: "03,09", title: "车辆预警分析", to: "carWarning", submenu: [] },
   {
