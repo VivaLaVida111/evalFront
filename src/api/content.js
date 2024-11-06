@@ -62,6 +62,54 @@ export function updateSubdivision(data) {
     })
 }
 
+export function addBigRule(data) {
+    return request({
+        url: '/big-rules/add',
+        method: 'post',
+        data
+    })
+}
+
+export function deleteBigRule(data) {
+    return request({
+        url: '/big-rules/delete',
+        method: 'post',
+        data
+    })
+}
+
+export function updateBigRule(data) {   
+    return request({
+        url: '/big-rules/update',
+        method: 'post',
+        data
+    })
+}
+
+export function addSmallRule(data) {
+    return request({
+        url: '/small-rules/add',
+        method: 'post',
+        data
+    })
+}
+
+export function deleteSmallRule(data) {
+    return request({
+        url: '/small-rules/delete',
+        method: 'post',
+        data
+    })
+}
+
+export function updateSmallRule(data) {
+    return request({
+        url: '/small-rules/update',
+        method: 'post',
+        data
+    })
+}
+
 export function formatLocalDateTime() {
     const date = new Date();
     const year = date.getFullYear();
