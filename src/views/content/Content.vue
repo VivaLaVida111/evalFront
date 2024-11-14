@@ -27,7 +27,7 @@
         </div>
         <el-dropdown>
           <span class="el-dropdown-link">
-             <div style="font-size:0.25rem; padding-right:10px;margin-top:0.05rem">{{ user.username + "（" + user.role + "）" }}</div>
+             <div style="font-size:0.25rem; padding-right:10px;margin-top:0.05rem">{{ params.realname + "（" + params.role + "）" }}</div>
             <el-icon style="font-size:0.25rem;position:absolute;right:0;top:0;;margin-top:0.05rem">
               <ArrowDown />
             </el-icon>
@@ -106,6 +106,7 @@ import { House, ArrowDown, Setting, Link } from "@element-plus/icons-vue";
 import Header from "@/components/Header.vue";
 import { ref, onMounted, reactive, onBeforeMount } from "vue";
 import axios from "axios";
+import { params } from "@/store/store.js";
 
 
 // =========================================================

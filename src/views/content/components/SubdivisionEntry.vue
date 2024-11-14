@@ -64,19 +64,23 @@
           <el-button type="primary" @click="submitForm">提交</el-button>
         </el-form-item>
       </el-form>
+      <div ref="chartContainer" style="width: 100%; height: 400px;"></div>
     </el-main>
   </el-container>
 </template>
 
 <script setup>
-import { ref, reactive, computed, watch } from "vue";
+import { ref, reactive, computed, watch, onMounted } from "vue";
 import {
   getDetailRules,
   addSubdivision,
   formatLocalDateTime,
+  getStreetStatistics,
 } from "@/api/content.js";
 import { ElMessage } from "element-plus";
 import { params } from "@/store/store.js";
+import * as echarts from "echarts";
+import moment from "moment";
 
 const props = defineProps({
   formData: {
@@ -98,6 +102,8 @@ const props = defineProps({
 
 const localFormData = reactive({ ...props.formData });
 const localSubmitVisible = ref(props.submitVisible);
+const chartContainer = ref(null);
+let chartInstance = null;
 
 watch(
   () => props.formData,
@@ -146,7 +152,7 @@ const streets = ref([
 ]);
 
 const smallRules = computed(() => {
-  if (localFormData.bigRulesId !== null) {
+  if (localFormData.bigRulesId !== null && localFormData.bigRulesId !== '') {
     const selectedRule = filteredDetailRules.value.find(
       (rule) => rule.bigRules.id === localFormData.bigRulesId
     );
@@ -156,6 +162,64 @@ const smallRules = computed(() => {
   }
   return [];
 });
+
+const today = moment().format("YYYY-MM-DD");
+const firstDayOfMonth = moment().startOf("month").format("YYYY-MM-DD");
+let changeValue = ref([firstDayOfMonth, today]);
+function changeDate() {
+  var start = moment(changeValue.value[0]).format("YYYY-MM-DD") + "T00:00:00";
+  var end = moment(changeValue.value[1]).format("YYYY-MM-DD") + "T23:59:59";
+  //getPenaltyPoints(start, end, 1);
+}
+
+watch(
+  () => localFormData.bigRulesId,
+  async (newVal) => {
+    if (newVal !== null && newVal !== '') {
+      const statistics = await getStreetStatistics(firstDayOfMonth, today, newVal);
+      renderChart(statistics);
+    } else {
+      clearChart();
+    }
+  }
+);
+
+function renderChart(statistics) {
+  if (!chartInstance) {
+    chartInstance = echarts.init(chartContainer.value);
+  }
+
+  statistics.sort((a, b) => a.score - b.score);
+
+  const option = {
+    title: {
+      text: '街道评分统计',
+    },
+    tooltip: {},
+    xAxis: {
+      type: 'value',
+    },
+    yAxis: {
+      type: 'category',
+      data: statistics.map(item => item.street),
+    },
+    series: [
+      {
+        name: '分数',
+        type: 'bar',
+        data: statistics.map(item => item.score),
+      },
+    ],
+  };
+
+  chartInstance.setOption(option);
+}
+
+function clearChart() {
+  if (chartInstance) {
+    chartInstance.clear();
+  }
+}
 
 function onBigRulesChange() {
   localFormData.smallRulesId = null;

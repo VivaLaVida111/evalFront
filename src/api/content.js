@@ -17,6 +17,13 @@ export function getScore(start, end) {
     })
 }
 
+export function getStreetStatistics(start, end, bigRuleId) {
+    return request({
+        url: '/details/streetStatistics/' + start + '/' + end + '/' + bigRuleId,
+        method: 'get'
+    })
+}
+
 export function getDetails(start, end, street) {
     return request({
         url: '/details/period/' + start + '/' + end + '/' + street,

@@ -36,7 +36,7 @@
         <el-dropdown>
           <span class="el-dropdown-link">
             <div style="font-size: 0.25rem; padding-right: 10px">
-              {{ user.username + "（" + user.role + "）" }}
+              {{ params.realname + "（" + params.role + "）" }}
             </div>
             <el-icon
               style="font-size: 0.25rem; position: absolute; right: 0; top: 0"
@@ -98,6 +98,7 @@
                 {{ rule.score }}
               </li>
               <li
+                v-if="bigRulesStatistics.length < 5"
                 v-for="index in 5 - bigRulesStatistics.length"
                 :key="'empty-' + index"
               >
@@ -114,6 +115,7 @@
                 {{ rule.item }}
               </li>
               <li
+                v-if="bigRulesStatistics.length < 5"
                 v-for="index in 5 - bigRulesStatistics.length"
                 :key="'empty-' + index"
               >
