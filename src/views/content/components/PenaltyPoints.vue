@@ -61,8 +61,8 @@
             :show-overflow-tooltip="true"
           />
           <el-table-column
-            prop="small_rules_percentage"
-            label="小项占比"
+            prop="input"
+            label="小项扣分"
             min-width="75"
             header-align="center"
             align="center"
@@ -172,7 +172,7 @@
         </el-form-item>
         <el-form-item label="加减分值">
           <el-input-number
-            v-model="localFormData.subtotal"
+            v-model="localFormData.input"
             :step="0.1"
           ></el-input-number>
         </el-form-item>
@@ -248,7 +248,7 @@ const localFormData = reactive({
   bigRulesId: null,
   smallRulesId: null,
   remark: "",
-  subtotal: 0,
+  input: 0,
   time: "",
 });
 
@@ -293,7 +293,7 @@ const getPenaltyPoints = (startTime, endTime, pageNum) => {
           big_rules: null,
           big_rules_percentage: null,
           small_rules: null,
-          small_rules_percentage: null,
+          input: null,
           subtotal: data[key].subtotal,
           time: null,
         };
@@ -305,7 +305,7 @@ const getPenaltyPoints = (startTime, endTime, pageNum) => {
           big_rules_percentage: data[key].bigRules.percentage,
           big_rules_id: data[key].bigRules.id,
           small_rules: data[key].smallRules.item,
-          small_rules_percentage: data[key].smallRules.percentage,
+          input: data[key].input,
           small_rules_id: data[key].smallRules.id,
           subtotal: data[key].subtotal,
           time: data[key].time,
@@ -405,9 +405,9 @@ function validateFormData() {
   }
 
   if (
-    localFormData.subtotal === null ||
-    localFormData.subtotal === undefined ||
-    localFormData.subtotal === 0
+    localFormData.input === null ||
+    localFormData.input === undefined ||
+    localFormData.input === 0
   ) {
     ElMessage({
       message: "请填写加减分值",
@@ -424,7 +424,7 @@ function resetFormData() {
   localFormData.bigRulesId = null;
   localFormData.smallRulesId = null;
   localFormData.remark = "";
-  localFormData.subtotal = 0;
+  localFormData.input = 0;
   localFormData.time = "";
 }
 
@@ -435,7 +435,7 @@ function editRecord(record, index) {
   localFormData.bigRulesId = record.big_rules_id;
   localFormData.smallRulesId = record.small_rules_id;
   localFormData.remark = record.remark;
-  localFormData.subtotal = record.subtotal;
+  localFormData.input = record.input;
   localFormData.time = record.time;
   dialogVisible.value = true;
 }
@@ -501,9 +501,10 @@ function parseFormData(formData) {
     big_rules_percentage: filteredDetailRules.value.find(rule => rule.bigRules.id === formData.bigRulesId)?.bigRules.percentage || '',
     big_rules_id: formData.bigRulesId,
     small_rules: smallRules.value.find(rule => rule.id === formData.smallRulesId)?.item || '',
-    small_rules_percentage: smallRules.value.find(rule => rule.id === formData.smallRulesId)?.percentage || '',
+    //small_rules_percentage: smallRules.value.find(rule => rule.id === formData.smallRulesId)?.percentage || '',
+    input: formData.input,
     small_rules_id: formData.smallRulesId,
-    subtotal: formData.subtotal,
+    subtotal: formData.input * big_rules_percentage / 100,
     time: formData.time,
     remark: formData.remark,
   };

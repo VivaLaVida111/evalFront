@@ -223,7 +223,7 @@ const menuList = [
   // { icon: '02,01', title: '金牛区汇总统计分析', to: 'jinniu', submenu: [] },
   {
     icon: "02,14",
-    title: "考评分数查询",
+    title: "考评事件查询",
     to: "penaltyPoints",
     submenu: [
       { icon: "", title: "抚琴街道", to: "penaltyPoints", query: "抚琴街道"  },

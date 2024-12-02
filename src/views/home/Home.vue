@@ -1957,7 +1957,7 @@ const fontSizeSwitch = (res) => {
  * 横向柱形图1
  */
 var start = moment().startOf("month").format("YYYY-MM-DD");
-var end = moment().format("YYYY-MM-DD");
+var end = moment().add(1, 'days').format("YYYY-MM-DD");;
 const scoresList = reactive([]);
 const streetsList = reactive([]);
 

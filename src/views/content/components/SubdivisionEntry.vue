@@ -56,7 +56,7 @@
         </el-form-item>
         <el-form-item label="加减分值">
           <el-input-number
-            v-model="localFormData.subtotal"
+            v-model="localFormData.input"
             :step="0.1"
           ></el-input-number>
         </el-form-item>
@@ -90,7 +90,7 @@ const props = defineProps({
       bigRulesId: null,
       smallRulesId: null,
       remark: "",
-      subtotal: 0,
+      input: 0,
       time: "",
     }),
   },
@@ -163,8 +163,8 @@ const smallRules = computed(() => {
   return [];
 });
 
-const today = moment().format("YYYY-MM-DD");
-const firstDayOfMonth = moment().startOf("month").format("YYYY-MM-DD");
+const today = moment().format("YYYY-MM-DD") + "T23:59:59";
+const firstDayOfMonth = moment().startOf("month").format("YYYY-MM-DD") + "T00:00:00";
 let changeValue = ref([firstDayOfMonth, today]);
 function changeDate() {
   var start = moment(changeValue.value[0]).format("YYYY-MM-DD") + "T00:00:00";
@@ -249,9 +249,9 @@ function validateFormData() {
   }
 
   if (
-    localFormData.subtotal === null ||
-    localFormData.subtotal === undefined ||
-    localFormData.subtotal === 0
+    localFormData.input === null ||
+    localFormData.input === undefined ||
+    localFormData.input === 0
   ) {
     ElMessage({
       message: "请填写加减分值",
@@ -267,7 +267,7 @@ function resetFormData() {
   localFormData.bigRulesId = null;
   localFormData.smallRulesId = null;
   localFormData.remark = "";
-  localFormData.subtotal = 0;
+  localFormData.input = 0;
   localFormData.time = "";
 }
 
