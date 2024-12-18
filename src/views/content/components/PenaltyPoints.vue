@@ -442,7 +442,7 @@ function editRecord(record, index) {
 
 function validateModifyDate(time) {
   //console.log("time:", time);
-  const startOfLastMonth = moment().subtract(1, 'months').startOf('month');
+  const startOfLastMonth = moment().subtract(12, 'months').startOf('month');
   const endOfThisMonth = moment().endOf('month');
   const modifyDate = moment(time);
   var res = modifyDate.isBetween(startOfLastMonth, endOfThisMonth, null, '[]');
