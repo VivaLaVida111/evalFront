@@ -2,7 +2,7 @@
   <el-container>
     <el-header style="font-size: 25px; padding: 5px">
       <h5 class="card-title" style="font-size: 30px; padding: 5px">
-        考评事件查询
+        体征事件查询
       </h5>
     </el-header>
     <el-main>
@@ -271,7 +271,9 @@ const getPenaltyPoints = (startTime, endTime, pageNum) => {
       pageNum +
       "/8" +
       "?street=" +
-      street.value;
+      street.value +
+      "&roles=" +
+      params.role;
   }
   axios({
     url: URL,

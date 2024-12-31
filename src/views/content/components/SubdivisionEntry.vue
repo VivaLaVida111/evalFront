@@ -2,7 +2,7 @@
   <el-container>
     <el-header style="font-size: 25px; padding: 5px">
       <h5 class="card-title" style="font-size: 30px; padding: 5px">
-        考评分数录入
+        体征分数录入
       </h5>
     </el-header>
     <OptionalEntry />

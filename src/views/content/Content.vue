@@ -223,9 +223,10 @@ const menuList = [
   // { icon: '02,01', title: '金牛区汇总统计分析', to: 'jinniu', submenu: [] },
   {
     icon: "02,14",
-    title: "考评事件查询",
+    title: "体征事件查询",
     to: "penaltyPoints",
     submenu: [
+      { icon: "", title: "全区", to: "penaltyPoints" },
       { icon: "", title: "抚琴街道", to: "penaltyPoints", query: "抚琴街道"  },
       { icon: "", title: "西安路街道", to: "penaltyPoints", query: "西安路街道"  },
       { icon: "", title: "驷马桥街道", to: "penaltyPoints", query: "驷马桥街道"  },
@@ -244,7 +245,7 @@ const menuList = [
 
   // { icon: '03,16', title: '垃圾预测', to: 'qdkq', submenu: [] },
   { icon: "03,17", title: "评分规则", to: "ruleConfig", submenu: [] },
-  { icon: "03,17", title: "考评分数录入", to: "subdivisionEntry", submenu: [] },
+  { icon: "03,17", title: "体征分数录入", to: "subdivisionEntry", submenu: [] },
   /* { icon: "01,16", title: "车辆轨迹分析", to: "carRecord", submenu: [] },
   { icon: "03,09", title: "车辆预警分析", to: "carWarning", submenu: [] },
   {
