@@ -1,7 +1,7 @@
 <template>
   <el-container class="dcontainer">
     <!-- 导航栏 -->
-    <Header style="height: 8%;  background-color: #004B8C; " :icon="null">
+    <Header style="height: 8%; background-color: #004b8c" :icon="null">
       <!-- 系统名字 -->
       <template #title>
         <span class="text-title">金牛区城乡环境综合治理体征监测系统</span>
@@ -27,8 +27,24 @@
         </div>
         <el-dropdown>
           <span class="el-dropdown-link">
-             <div style="font-size:0.25rem; padding-right:10px;margin-top:0.05rem">{{ params.realname + "（" + params.role + "）" }}</div>
-            <el-icon style="font-size:0.25rem;position:absolute;right:0;top:0;;margin-top:0.05rem">
+            <div
+              style="
+                font-size: 0.25rem;
+                padding-right: 10px;
+                margin-top: 0.05rem;
+              "
+            >
+              {{ params.realname + "（" + params.role + "）" }}
+            </div>
+            <el-icon
+              style="
+                font-size: 0.25rem;
+                position: absolute;
+                right: 0;
+                top: 0;
+                margin-top: 0.05rem;
+              "
+            >
               <ArrowDown />
             </el-icon>
           </span>
@@ -41,35 +57,50 @@
       </template>
     </Header>
 
-
     <el-container class="data-container">
       <el-aside>
         <el-menu class="menu" default-active="1">
           <!--有二级菜单，则以子菜单的形式展示;没有二级菜单，则以菜单项显示-->
           <template v-for="(item, idx) in menuList">
-            <template v-if="item.submenu.length != 0">
+            <template v-if="item.submenu.length > 0">
               <el-sub-menu :index="idx + ''" :key="idx" collapse="true">
+                <!-- 一级标题 -->
                 <template #title>
                   <div
                     class="menu-img-default menu-img"
                     :style="getIcon(item.icon)"
                   ></div>
-                  <!-- <el-image :src="require('@/assets/yyxt/' + item.icon)" class="menu-img"/> -->
-                  <span style="font-size: .25rem">{{ item.title }}</span>
+                  <span style="font-size: 0.25rem">{{ item.title }}</span>
                 </template>
-                <el-menu-item
-                  v-for="(subitem, subidx) in item.submenu"
-                  :index="idx + '-' + subidx"
-                  :key="subidx"
-                  @click="displayContentWithQuery(subitem.to, subitem.query)"
-                >
-                  <div
-                    class="menu-img-default menu-img"
-                    :style="getIcon(item.icon)"
-                  ></div>
-                  <!-- <el-image :src="require('@/assets/yyxt/' + item.icon)" class="menu-img"/> -->
-                  <span style="font-size: .25rem">{{ subitem.title }}</span>
-                </el-menu-item>
+                <template v-for="(subitem, subidx) in item.submenu">
+                  <!-- 分两种情况，1.当用户是某大规则的管理员时（不包含总的管理者）只能看到按街道查询的内容，同时按街道查询下的内容只显示该规则的事件 -->
+                  <!-- 2.当用户是普通浏览者或管理者时，既可以按街道查询，又可以按管理门类（大规则）查询；按街道查询时，显示该街道所有大规则的扣分；按管理门类查询时，显示该规则下所有街道的扣分 -->
+                  <el-sub-menu
+                    :index="idx + '-' + subidx"
+                    :key="idx + '-' + subidx"
+                    v-if="subitem.submenu && subitem.submenu.length && subitem.visible !== false"
+                  >
+                    <!-- 二级标题 -->
+                    <template #title>
+                      <span style="font-size: 0.25rem">{{
+                        subitem.title
+                      }}</span>
+                    </template>
+                    <el-menu-item
+                      v-for="(subsubitem, subsubidx) in subitem.submenu"
+                      :index="idx + '-' + subidx + '-' + subsubidx"
+                      :key="idx + '-' + subidx + '-' + subsubidx"
+                      @click="
+                        displayContentWithQuery(subsubitem.to, subsubitem.street, subsubitem.roles)
+                      "
+                    >
+                      <!-- 三级标题 -->
+                      <span style="font-size: 0.25rem">{{
+                        subsubitem.title
+                      }}</span>
+                    </el-menu-item>
+                  </el-sub-menu>
+                </template>
               </el-sub-menu>
             </template>
             <template v-else>
@@ -82,15 +113,10 @@
                   class="menu-img-default menu-img"
                   :style="getIcon(item.icon)"
                 ></div>
-                <!-- <el-image :src="require('@/assets/yyxt/' + item.icon)" class="menu-img"/> -->
-                <span style="font-size: .25rem">{{ item.title }}</span>
+                <span style="font-size: 0.25rem">{{ item.title }}</span>
               </el-menu-item>
             </template>
           </template>
-          <!-- <el-menu-item>
-              <el-icon><component :is="Link"></component></el-icon>
-              <span style="font-size:20px"><a href="http://101.37.246.72/denglu_xzzf.exe" target="_blank">跳转主页</a></span>
-            </el-menu-item> -->
         </el-menu>
       </el-aside>
       <el-main>
@@ -107,7 +133,6 @@ import Header from "@/components/Header.vue";
 import { ref, onMounted, reactive, onBeforeMount } from "vue";
 import axios from "axios";
 import { params } from "@/store/store.js";
-
 
 // =========================================================
 
@@ -132,50 +157,8 @@ function toSystem(item) {
 //部门列表, 从后端获取
 onMounted(() => {
   // 默认跳转到jinniu子组件
-  router.push("/content/penaltyPoints");
-  //从地图主页跳转到content下的其他子组件
-  if (route.query.carNumber) {
-    var carNumber = route.query.carNumber;
-    router.push({
-      path: "/content/carDetailInfo",
-      query: { carNumber: carNumber },
-    });
-  }
-  if (route.query.station == 1) {
-
-    router.push({
-      path: "/content/Hongxing",
-
-    });
-  }
-        if (route.query.station==2) {
-
-    router.push({
-      path: "/content/Xihua",
-      
-    });
-  }
-          if (route.query.station==3) {
-
-    router.push({
-      path: "/content/Wukuaishi",
-      
-    });
-  }
-          if (route.query.station==4) {
-
-    router.push({
-      path: "/content/Wulidun",
-      
-    });
-  }
-          if (route.query.station==5) {
-
-    router.push({
-      path: "/content/Honghuayan",
-      
-    });
-  }
+  //router.push("/content/penaltyPoints");
+  router.push({ path: "/content/penaltyPoints", query: { roles: params.role } });
 });
 
 // 系统列表
@@ -216,57 +199,271 @@ function logout() {
   //TODO 清除登录信息
   router.push("/login");
 }
-//   onMounted(()=>router.push('/xzzf/qdkq'))
 
 // 这个应该从后台请求获得
 const menuList = [
-  // { icon: '02,01', title: '金牛区汇总统计分析', to: 'jinniu', submenu: [] },
   {
     icon: "02,14",
     title: "体征事件查询",
     to: "penaltyPoints",
     submenu: [
-      { icon: "", title: "全区", to: "penaltyPoints" },
-      { icon: "", title: "抚琴街道", to: "penaltyPoints", query: "抚琴街道"  },
-      { icon: "", title: "西安路街道", to: "penaltyPoints", query: "西安路街道"  },
-      { icon: "", title: "驷马桥街道", to: "penaltyPoints", query: "驷马桥街道"  },
-      { icon: "", title: "荷花池街道", to: "penaltyPoints", query: "荷花池街道"  },
-      { icon: "", title: "五块石街道", to: "penaltyPoints", query: "五块石街道"  },
-      { icon: "", title: "九里堤街道", to: "penaltyPoints", query: "九里堤街道"  },
-      { icon: "", title: "营门口街道", to: "penaltyPoints", query: "营门口街道"  },
-      { icon: "", title: "茶店子街道", to: "penaltyPoints", query: "茶店子街道"  },
-      { icon: "", title: "金泉街道", to: "penaltyPoints", query:  "金泉街道" },
-      { icon: "", title: "沙河源街道", to: "penaltyPoints", query: "沙河源街道"  },
-      { icon: "", title: "天回镇街道", to: "penaltyPoints", query: "天回镇街道"  },
-      { icon: "", title: "西华街道", to: "penaltyPoints", query: "西华街道"  },
-      { icon: "", title: "凤凰山街道", to: "penaltyPoints", query: "凤凰山街道"  }
+      {
+        icon: "",
+        title: "按街道查询",
+        to: "",
+        visible: true,
+        submenu: [
+          { icon: "", title: "全区", to: "penaltyPoints" },
+          {
+            icon: "",
+            title: "抚琴街道",
+            to: "penaltyPoints",
+            street: "抚琴街道",
+            visible: true,
+          },
+          {
+            icon: "",
+            title: "西安路街道",
+            to: "penaltyPoints",
+            street: "西安路街道",
+            visible: true,
+          },
+          {
+            icon: "",
+            title: "驷马桥街道",
+            to: "penaltyPoints",
+            street: "驷马桥街道",
+            visible: true,
+          },
+          {
+            icon: "",
+            title: "荷花池街道",
+            to: "penaltyPoints",
+            street: "荷花池街道",
+            visible: true,
+          },
+          {
+            icon: "",
+            title: "五块石街道",
+            to: "penaltyPoints",
+            street: "五块石街道",
+            visible: true,
+          },
+          {
+            icon: "",
+            title: "九里堤街道",
+            to: "penaltyPoints",
+            street: "九里堤街道",
+            visible: true,
+          },
+          {
+            icon: "",
+            title: "营门口街道",
+            to: "penaltyPoints",
+            street: "营门口街道",
+            visible: true,
+          },
+          {
+            icon: "",
+            title: "茶店子街道",
+            to: "penaltyPoints",
+            street: "茶店子街道",
+            visible: true,
+          },
+          {
+            icon: "",
+            title: "金泉街道",
+            to: "penaltyPoints",
+            street: "金泉街道",
+            visible: true,
+          },
+          {
+            icon: "",
+            title: "沙河源街道",
+            to: "penaltyPoints",
+            street: "沙河源街道",
+            visible: true,
+          },
+          {
+            icon: "",
+            title: "天回镇街道",
+            to: "penaltyPoints",
+            street: "天回镇街道",
+            visible: true,
+          },
+          {
+            icon: "",
+            title: "西华街道",
+            to: "penaltyPoints",
+            street: "西华街道",
+            visible: true,
+          },
+          {
+            icon: "",
+            title: "凤凰山街道",
+            to: "penaltyPoints",
+            street: "凤凰山街道",
+            visible: true,
+          },
+        ],
+      },
+      {
+        icon: "",
+        title: "按管理门类查询",
+        to: "",
+        visible: params.role === "viewer" || params.role.includes("管理者"),
+        submenu: [
+          {
+            icon: "",
+            title: "环境卫生",
+            to: "penaltyPoints",
+            roles: "环境卫生",
+            visible: params.role === "viewer" || params.role.includes("管理者"),
+          },
+          {
+            icon: "",
+            title: "市容秩序",
+            to: "penaltyPoints",
+            roles: "市容秩序",
+            visible: params.role === "viewer" || params.role.includes("管理者"),
+          },
+          {
+            icon: "",
+            title: "执法案件办理",
+            to: "penaltyPoints",
+            roles: "执法案件办理",
+            visible: params.role === "viewer" || params.role.includes("管理者"),
+          },
+          {
+            icon: "",
+            title: "广告招牌",
+            to: "penaltyPoints",
+            roles: "广告招牌",
+            visible: params.role === "viewer" || params.role.includes("管理者"),
+          },
+          {
+            icon: "",
+            title: "扬尘治理",
+            to: "penaltyPoints",
+            roles: "扬尘治理",
+            visible: params.role === "viewer" || params.role.includes("管理者"),
+          },
+          {
+            icon: "",
+            title: "园林绿化",
+            to: "penaltyPoints",
+            roles: "园林绿化",
+            visible: params.role === "viewer" || params.role.includes("管理者"),
+          },
+          {
+            icon: "",
+            title: "通讯设施治理",
+            to: "penaltyPoints",
+            roles: "通讯设施治理",
+            visible: params.role === "viewer" || params.role.includes("管理者"),
+          },
+          {
+            icon: "",
+            title: "河道沟渠环境治理",
+            to: "penaltyPoints",
+            roles: "河道沟渠环境治理",
+            visible: params.role === "viewer" || params.role.includes("管理者"),
+          },
+          {
+            icon: "",
+            title: "再生资源体系建设",
+            to: "penaltyPoints",
+            roles: "再生资源体系建设",
+            visible: params.role === "viewer" || params.role.includes("管理者"),
+          },
+          {
+            icon: "",
+            title: "工地治理",
+            to: "penaltyPoints",
+            roles: "工地治理",
+            visible: params.role === "viewer" || params.role.includes("管理者"),
+          },
+          {
+            icon: "",
+            title: "闲置地块脏乱差治理",
+            to: "penaltyPoints",
+            roles: "闲置地块脏乱差治理",
+            visible: params.role === "viewer" || params.role.includes("管理者"),
+          },
+          {
+            icon: "",
+            title: "油烟负面清单",
+            to: "penaltyPoints",
+            roles: "油烟负面清单",
+            visible: params.role === "viewer" || params.role.includes("管理者"),
+          },
+          {
+            icon: "",
+            title: "固体废弃物处置及垃圾分类",
+            to: "penaltyPoints",
+            roles: "固体废弃物处置及垃圾分类",
+            visible: params.role === "viewer" || params.role.includes("管理者"),
+          },
+          {
+            icon: "",
+            title: "数字化常态监管",
+            to: "penaltyPoints",
+            roles: "数字化常态监管",
+            visible: params.role === "viewer" || params.role.includes("管理者"),
+          },
+          {
+            icon: "",
+            title: "网络理政",
+            to: "penaltyPoints",
+            roles: "网络理政",
+            visible: params.role === "viewer" || params.role.includes("管理者"),
+          },
+          {
+            icon: "",
+            title: "油烟治理",
+            to: "penaltyPoints",
+            roles: "油烟治理",
+            visible: params.role === "viewer" || params.role.includes("管理者"),
+          },
+          {
+            icon: "",
+            title: "第三方测评",
+            to: "penaltyPoints",
+            roles: "第三方测评",
+            visible: params.role === "viewer" || params.role.includes("管理者"),
+          },
+          {
+            icon: "",
+            title: "领导小组综合评价",
+            to: "penaltyPoints",
+            roles: "领导小组综合评价",
+            visible: params.role === "viewer" || params.role.includes("管理者"),
+          },
+        ],
+      },
     ],
   },
-
-  // { icon: '03,16', title: '垃圾预测', to: 'qdkq', submenu: [] },
   { icon: "03,17", title: "评分规则", to: "ruleConfig", submenu: [] },
   { icon: "03,17", title: "体征分数录入", to: "subdivisionEntry", submenu: [] },
-  /* { icon: "01,16", title: "车辆轨迹分析", to: "carRecord", submenu: [] },
-  { icon: "03,09", title: "车辆预警分析", to: "carWarning", submenu: [] },
-  {
-    icon: "03,10",
-    title: "垃圾渗滤液",
-    to: "osmoticFluid",
-      submenu: [
-      { icon: "", title: "大站渗滤液汇总", to: "osmoticFluid" },
-      { icon: "", title: "红星站渗滤液", to: "hongxingShenlvye" },
-      { icon: "", title: "西华站渗滤液", to: "xihuaShenlvye" },
-   
-    ],
-  },
-  { icon: "02,14", title: "告警事件历史查询", to: "alarmEvent", submenu: [] }, */
 ];
+
 function displayContent(name) {
   router.push({ name });
 }
-function displayContentWithQuery(name, params) {
-  router.push({ path: name, query: {street: params} });
+
+function displayContentWithQuery(name, street, roles) {
+  if (roles != undefined && roles != "") {
+    // 有roles参数，说明是按管理门类查询
+    router.push({ path: name, query: { roles: roles } });
+  } else if (street != undefined && street != "") {
+    // 有street参数，说明是按街道查询；同时传递roles参数对大规则进行过滤：对应大规则的管理员只能看到该规则的事件，viewer和总的管理者可以看到所有规则的事件
+    router.push({ path: name, query: { street: street, roles: params.role } });
+  } else {
+    // 无参数，传递roles参数对大规则进行过滤
+    router.push({ path: name, query: { roles: params.role } });
+  }
 }
+
 function getIcon(idxStr) {
   const len = -30;
   const x = parseInt(idxStr.split(",")[1] - 1) * len;
@@ -345,7 +542,7 @@ function getIcon(idxStr) {
 }
 
 .el-dropdown-link {
-  font-size: .25rem;
+  font-size: 0.25rem;
 }
 
 .table {
@@ -360,12 +557,12 @@ function getIcon(idxStr) {
 }
 
 .router {
-  padding: .1875rem;
-  font-size: .3125rem;
-  margin-left: .125rem;
- 
+  padding: 0.1875rem;
+  font-size: 0.3125rem;
+  margin-left: 0.125rem;
+
   white-space: nowrap;
-  letter-spacing: .0375rem;
+  letter-spacing: 0.0375rem;
 }
 
 .content {
@@ -453,7 +650,7 @@ function getIcon(idxStr) {
 :deep(.amap-copyright) {
   opacity: 0;
 }
-/* ============================================================= */
+
 #dotClass {
   width: 25px;
   height: 25px;

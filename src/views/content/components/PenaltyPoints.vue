@@ -214,6 +214,9 @@ const route = useRoute();
 const street = computed(() => {
   return isEmptyObject(route.query) ? "" : route.query.street;
 });
+const roles = computed(() => {
+  return isEmptyObject(route.query) ? "" : route.query.roles;
+});
 
 let totalRecords = ref(1000);
 let currentPage = ref(1);
@@ -259,22 +262,12 @@ function changeDate() {
 }
 
 const getPenaltyPoints = (startTime, endTime, pageNum) => {
-  var URL = "/api/details/period/";
-  if (street.value === "") {
-    URL += startTime + "/" + endTime + "/" + pageNum + "/8";
-  } else {
-    URL +=
-      startTime +
-      "/" +
-      endTime +
-      "/" +
-      pageNum +
-      "/8" +
-      "?street=" +
-      street.value +
-      "&roles=" +
-      params.role;
+  var URL = "/api/details/period/" + startTime + "/" + endTime + "/" + pageNum + "/8";
+  const queryString = new URLSearchParams(route.query).toString();
+  if (queryString !== "") {
+    URL += "?" + queryString;
   }
+  console.log("getPenaltyPoints URL: ", URL);
   axios({
     url: URL,
     method: "get",
@@ -292,6 +285,7 @@ const getPenaltyPoints = (startTime, endTime, pageNum) => {
       if (data[key].id === null) {
         var detail = {
           id: null,
+          street: data[key].street,
           big_rules: null,
           big_rules_percentage: null,
           small_rules: null,
