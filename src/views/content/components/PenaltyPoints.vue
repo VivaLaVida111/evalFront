@@ -18,6 +18,13 @@
         size="large"
         style="margin: 0.5rem 0 0.5rem"
       />
+      <el-button
+        type="primary"
+        size="large"
+        style="margin-left: 10px"
+        @click="exportExcelOfPenaltyPoints"
+        >打印报表</el-button
+      >
       <router-view :key="$route.fullPath">
         <el-table
           :data="detailsList"
@@ -201,7 +208,7 @@ import {
   addSubdivision,
   formatLocalDateTime,
   deleteSubdivision,
-  updateSubdivision
+  updateSubdivision,
 } from "@/api/content.js";
 import { ElMessage } from "element-plus";
 import SubdivisionEntry from "./SubdivisionEntry.vue";
@@ -261,8 +268,48 @@ function changeDate() {
   getPenaltyPoints(start, end, 1);
 }
 
+const exportExcelOfPenaltyPoints = () => {
+  var start = moment(changeValue.value[0]).format("YYYY-MM-DD") + "T00:00:00";
+  var end = moment(changeValue.value[1]).format("YYYY-MM-DD") + "T23:59:59";
+  var URL = "/api/details/period/excel/" + start + "/" + end;
+  const queryString = new URLSearchParams(route.query).toString();
+  if (queryString !== "") {
+    URL += "?" + queryString;
+  }
+  console.log("exportExcelOfPenaltyPoints URL: ", URL);
+
+  axios({
+    url: URL,
+    method: "get",
+    responseType: "blob",
+  }).then(function (res) {
+    if (res.status === 200) {
+      console.log("成功了！");
+      console.log("res body: ", res.data);
+      // 生成blob对象 定义下载格式
+      let blob = new Blob([res.data], { type: res.headers['content-type'] });
+      // 获取文件名
+      console.log("res.headers: ", res.headers);
+      let contentDisposition = res.headers['content-disposition'];
+      let filename = decodeURIComponent(contentDisposition.split("filename=")[1]);
+      // 创建 a标签 执行下载
+      let downloadElement = document.createElement("a");
+      let href = window.URL.createObjectURL(blob); //创建下载的链接
+      downloadElement.href = href;
+      downloadElement.download = filename; //下载后文件名
+      document.body.appendChild(downloadElement); // 项目插入a元素
+      downloadElement.click(); //点击下载
+      document.body.removeChild(downloadElement); //下载完成移除元素
+      window.URL.revokeObjectURL(href); //释放blob对象
+    }
+  }).catch(function (error) {
+    console.error("下载失败：", error);
+  });
+};
+
 const getPenaltyPoints = (startTime, endTime, pageNum) => {
-  var URL = "/api/details/period/" + startTime + "/" + endTime + "/" + pageNum + "/8";
+  var URL =
+    "/api/details/period/" + startTime + "/" + endTime + "/" + pageNum + "/8";
   const queryString = new URLSearchParams(route.query).toString();
   if (queryString !== "") {
     URL += "?" + queryString;
@@ -281,32 +328,33 @@ const getPenaltyPoints = (startTime, endTime, pageNum) => {
     detailsList.splice(0, detailsList.length);
     var data = result.records;
     for (var key in data) {
-      var detail = null;
-      if (data[key].id === null) {
-        var detail = {
-          id: null,
-          street: data[key].street,
-          big_rules: null,
-          big_rules_percentage: null,
-          small_rules: null,
-          input: null,
-          subtotal: data[key].subtotal,
-          time: null,
-        };
-      } else {
-        var detail = {
-          id: data[key].id,
-          street: data[key].street,
-          big_rules: data[key].bigRules.item,
-          big_rules_percentage: data[key].bigRules.percentage,
-          big_rules_id: data[key].bigRules.id,
-          small_rules: data[key].smallRules.item,
-          input: data[key].input,
-          small_rules_id: data[key].smallRules.id,
-          subtotal: data[key].subtotal,
-          time: data[key].time,
-        };
-      }
+      var detail = {
+        street: data[key].street,
+        big_rules:
+          data[key].bigRules != undefined && data[key].bigRules != ""
+            ? data[key].bigRules.item
+            : null,
+        big_rules_percentage:
+          data[key].bigRules != undefined && data[key].bigRules != ""
+            ? data[key].bigRules.percentage
+            : null,
+        big_rules_id:
+          data[key].bigRules != undefined && data[key].bigRules != ""
+            ? data[key].bigRules.id
+            : null,
+        small_rules:
+          data[key].smallRules != undefined && data[key].smallRules != ""
+            ? data[key].smallRules.item
+            : null,
+        input: data[key].input,
+        small_rules_id:
+          data[key].smallRules != undefined && data[key].smallRules != ""
+            ? data[key].smallRules.id
+            : null,
+        subtotal: data[key].subtotal,
+        time: data[key].time,
+      };
+
       detailsList.push(detail);
     }
     totalRecords.value = result.total;
@@ -438,10 +486,10 @@ function editRecord(record, index) {
 
 function validateModifyDate(time) {
   //console.log("time:", time);
-  const startOfLastMonth = moment().subtract(12, 'months').startOf('month');
-  const endOfThisMonth = moment().endOf('month');
+  const startOfLastMonth = moment().subtract(12, "months").startOf("month");
+  const endOfThisMonth = moment().endOf("month");
   const modifyDate = moment(time);
-  var res = modifyDate.isBetween(startOfLastMonth, endOfThisMonth, null, '[]');
+  var res = modifyDate.isBetween(startOfLastMonth, endOfThisMonth, null, "[]");
   //console.log("isBetween result:", res);
 
   if (!res) {
@@ -458,7 +506,7 @@ function confirmEdit(localFormData) {
   if (!validateFormData()) {
     return;
   }
-  if(!validateModifyDate(localFormData.time)) {
+  if (!validateModifyDate(localFormData.time)) {
     return;
   }
 
@@ -493,14 +541,22 @@ function parseFormData(formData) {
   return {
     id: formData.id,
     street: formData.street,
-    big_rules: filteredDetailRules.value.find(rule => rule.bigRules.id === formData.bigRulesId)?.bigRules.item || '',
-    big_rules_percentage: filteredDetailRules.value.find(rule => rule.bigRules.id === formData.bigRulesId)?.bigRules.percentage || '',
+    big_rules:
+      filteredDetailRules.value.find(
+        (rule) => rule.bigRules.id === formData.bigRulesId
+      )?.bigRules.item || "",
+    big_rules_percentage:
+      filteredDetailRules.value.find(
+        (rule) => rule.bigRules.id === formData.bigRulesId
+      )?.bigRules.percentage || "",
     big_rules_id: formData.bigRulesId,
-    small_rules: smallRules.value.find(rule => rule.id === formData.smallRulesId)?.item || '',
+    small_rules:
+      smallRules.value.find((rule) => rule.id === formData.smallRulesId)
+        ?.item || "",
     //small_rules_percentage: smallRules.value.find(rule => rule.id === formData.smallRulesId)?.percentage || '',
     input: formData.input,
     small_rules_id: formData.smallRulesId,
-    subtotal: formData.input * big_rules_percentage / 100,
+    subtotal: (formData.input * big_rules_percentage) / 100,
     time: formData.time,
     remark: formData.remark,
   };
@@ -509,7 +565,7 @@ function parseFormData(formData) {
 function deleteRecord(localFormData) {
   // 处理删除逻辑
   //console.log("Deleting record with id:", id);
-  if(!validateModifyDate(localFormData.time)) {
+  if (!validateModifyDate(localFormData.time)) {
     return;
   }
   deleteSubdivision(localFormData).then((data) => {
