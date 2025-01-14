@@ -1,19 +1,33 @@
 <template>
   <el-container>
-    <el-header style="font-size: 25px; padding: 5px">
-      <h5 class="card-title" style="font-size: 30px; padding: 5px">
+    <el-header style="font-size: 25px; padding: 5px; display: flex; align-items: center;">
+      <h5 class="card-title" style="font-size: 30px; padding: 5px; margin-right: 20px;">
         体征分数录入
       </h5>
+      <el-button type="primary" @click="showOptionalEntry" style="margin-right: 10px;">选项式录入</el-button>
+      <el-button type="primary" @click="showTableEntry">表格式录入</el-button>
     </el-header>
-    <OptionalEntry />
+    <div v-if="currentView === 'OptionalEntry'">
+      <OptionalEntry />
+    </div>
+    <div v-else-if="currentView === 'TableEntry'">
+      <TableEntry />
+    </div>
   </el-container>
 </template>
 
 <script setup>
-// TODO：
-// 因为现在要实现两种录入逻辑，一种是选项式录入。一种是表格录入，所以要把这个录入部分拆分成两个组件，另外横向柱状图也要独立成一个组件
+import { ref } from 'vue';
 import OptionalEntry from "./OptionalEntry.vue";
+import TableEntry from "./TableEntry.vue";
 
+const currentView = ref('OptionalEntry');
 
+const showOptionalEntry = () => {
+  currentView.value = 'OptionalEntry';
+};
 
+const showTableEntry = () => {
+  currentView.value = 'TableEntry';
+};
 </script>

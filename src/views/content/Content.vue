@@ -82,7 +82,7 @@
                   >
                     <!-- 二级标题 -->
                     <template #title>
-                      <span style="font-size: 0.25rem">{{
+                      <span style="font-size: 0.20rem">{{
                         subitem.title
                       }}</span>
                     </template>
@@ -95,7 +95,7 @@
                       "
                     >
                       <!-- 三级标题 -->
-                      <span style="font-size: 0.25rem">{{
+                      <span style="font-size: 0.15rem">{{
                         subsubitem.title
                       }}</span>
                     </el-menu-item>
