@@ -135,7 +135,7 @@ const smallRules = computed(() => {
 const tableData = reactive(
   streets.value.map((street) => ({
     street: street.label,
-    scores: {},
+    scores: {}, // TODO : 目前是用smallRules的id作为数组下标，存在内存浪费问题；后续新建索引来进行优化，OptionEntry和TableEntry都有这问题
   }))
 );
 
