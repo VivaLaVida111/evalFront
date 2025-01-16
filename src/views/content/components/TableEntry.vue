@@ -26,14 +26,23 @@
           v-for="(smallRule, index) in smallRules"
           :key="index"
           :prop="smallRule.id.toString()"
-          :label="smallRule.item"
         >
+          <template #header>
+            <div class="header-content" :title="smallRule.item">
+              {{ smallRule.item }}
+            </div>
+          </template>
           <template #default="scope">
             <el-input-number
-              v-model="scope.row.scores[smallRule.id]"
+              v-model="scope.row.scores[index]"
               :step="0.1"
               placeholder="加减分值"
             ></el-input-number>
+          </template>
+        </el-table-column>
+        <el-table-column label="总计">
+          <template #default="scope">
+            {{ 100 + scope.row.scores.reduce((sum, score) => sum + score, 0) }}
           </template>
         </el-table-column>
       </el-table>
@@ -135,13 +144,13 @@ const smallRules = computed(() => {
 const tableData = reactive(
   streets.value.map((street) => ({
     street: street.label,
-    scores: {}, // TODO : 目前是用smallRules的id作为数组下标，存在内存浪费问题；后续新建索引来进行优化，OptionEntry和TableEntry都有这问题
+    scores: new Array(smallRules.value.length).fill(0),
   }))
 );
 
 function onBigRulesChange() {
   tableData.forEach((row) => {
-    row.scores = {};
+    row.scores = new Array(smallRules.value.length).fill(0);
   });
 }
 
@@ -163,11 +172,8 @@ function validateFormData() {
   }
 
   for (const row of tableData) {
-    for (const smallRule of smallRules.value) {
-      if (
-        row.scores[smallRule.id] === null ||
-        row.scores[smallRule.id] === undefined
-      ) {
+    for (const [index, smallRule] of smallRules.value.entries()) {
+      if (row.scores[index] === null || row.scores[index] === undefined) {
         ElMessage({
           message: `请填写街道 "${row.street}" 的小规则 "${smallRule.item}" 的加减分值`,
           type: "error",
@@ -195,12 +201,12 @@ function submitForm() {
   }
 
   const records = tableData.flatMap((row) =>
-    smallRules.value.map((smallRule) => ({
+    smallRules.value.map((smallRule, index) => ({
       street: row.street,
       bigRulesId: selectedBigRule.value,
       smallRulesId: smallRule.id,
       remark: remark.value,
-      input: row.scores[smallRule.id],
+      input: row.scores[index],
       time: selectedDate.value || formatLocalDateTime(),
     }))
   );
@@ -285,3 +291,14 @@ function clearChart() {
   }
 }
 </script>
+
+<style scoped>
+.header-content {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: normal;
+}
+</style>
