@@ -282,6 +282,9 @@ const exportExcelOfPenaltyPoints = () => {
     url: URL,
     method: "get",
     responseType: "blob",
+    headers: {
+      Authorization: "Bearer" + params.token,
+    },
   }).then(function (res) {
     if (res.status === 200) {
       console.log("成功了！");
