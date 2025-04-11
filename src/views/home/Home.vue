@@ -56,7 +56,22 @@
     <div class="mainDiv">
       <div class="columns">
         <div class="panel bar">
-          <h2>金牛区各街道成绩排名</h2>
+          <h2>金牛区城乡环境综合治理整治成效分析</h2>
+
+          <!-- 紧凑布局的选择器区域 -->
+          <div style="margin: 0; padding: 0; line-height: 1;">
+            <el-date-picker
+                v-model="selectedMonth"
+                type="month"
+                placeholder="选择月份"
+                format="YYYY-MM"
+                value-format="YYYY-MM"
+                :disabled-date="disabledMonth"
+                @change="handleMonthChange"
+                size="small"
+                style="width: 130px; height: 28px; font-size: 13px;"
+            />
+          </div>
 
           <div id="horizontal_bar"></div>
 
@@ -158,9 +173,11 @@
           </div>
         </div> -->
         <div class="panel bar">
-          <h2>大项规则扣分排名</h2>
+          <h2>金牛区城乡环境综合整治薄弱环节分析</h2>
 
           <div id="horizontal_bar1"></div>
+
+          <div id="pie_chart" style="height: 150px; margin-top: 10px;"></div>
 
           <div class="panel_footer"></div>
         </div>
@@ -2112,6 +2129,49 @@ const horizontalOpt1 = {
   animationEasingUpdate: "linear",
 };
 
+let pieChart = null;
+
+const createPieChart = () => {
+  const pieDom = document.getElementById("pie_chart");
+  if (!pieDom) return;
+  pieChart = echarts.init(pieDom);
+
+  const pieOption = {
+    tooltip: {
+      trigger: "item",
+    },
+    legend: {
+      orient: "vertical",
+      left: "left",
+      textStyle: {
+        color: "#333",
+      },
+    },
+    series: [
+      {
+        // name: "扣分占比",
+        type: "pie",
+        radius: "100%",
+        // top: "5%",
+        data: bigRulesStatistics.map((item) => ({
+          name: item.item,
+          value: Math.abs(item.score),
+        })),
+        emphasis: {
+          itemStyle: {
+            shadowBlur: 10,
+            shadowOffsetX: 0,
+            shadowColor: "rgba(0, 0, 0, 0.5)",
+          },
+        },
+      },
+    ],
+  };
+
+  pieChart.setOption(pieOption);
+  window.addEventListener("resize", pieChart.resize);
+};
+
 let horizontalBar1 = null;
 const create_horizontal_bar1 = async () => {
   try {
@@ -2131,6 +2191,7 @@ const create_horizontal_bar1 = async () => {
     //绘制图表
     horizontalBar1.setOption(horizontalOpt1);
     //horizontalBar.resize();
+    createPieChart();
     window.addEventListener("resize", horizontalBar1.resize);
   } catch (error) {
     console.error("Failed to create horizontal bar chart:", error);
@@ -2590,6 +2651,11 @@ li {
   opacity: 1;
 }
 
+.panel.bar {
+  height: auto; /* 自动根据内容扩展 */
+  overflow: visible; /* 避免超出部分被裁剪 */
+}
+
 #horizontal_bar {
   height: 9rem;
   width: 100%;
@@ -2598,10 +2664,16 @@ li {
 }
 
 #horizontal_bar1 {
-  height: 9rem;
+  height: 7rem;
   width: 100%;
   /* margin-top: -7vh; */
   opacity: 1;
+}
+
+#pie_chart {
+  height: 3rem;         /* 饼图也压缩一点高度 */
+  margin-top: 0.5rem;   /* 紧贴柱状图 */
+  width: 100%;
 }
 
 #small_pie {
