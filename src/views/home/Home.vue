@@ -73,7 +73,6 @@
           </div>
 
           <div id="horizontal_bar"></div>
-
           <div class="panel_footer"></div>
         </div>
         <!-- <div class="no">
