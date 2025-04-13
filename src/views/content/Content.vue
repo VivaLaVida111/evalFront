@@ -60,46 +60,58 @@
     <el-container class="data-container">
       <el-aside>
         <el-menu class="menu" default-active="1">
-          <!--有二级菜单，则以子菜单的形式展示;没有二级菜单，则以菜单项显示-->
+          <!-- 第一级菜单处理 -->
           <template v-for="(item, idx) in menuList">
-            <template v-if="item.submenu.length > 0">
+            <!-- 判断是否有二级菜单 -->
+            <!--有二级菜单，则以子菜单的形式展示;没有二级菜单，则以菜单项显示-->
+            <template v-if="item.title==params.role||params.role=='管理者'||params.role=='viewer' && item.submenu.length > 0">
               <el-sub-menu :index="idx + ''" :key="idx" collapse="true">
-                <!-- 一级标题 -->
+                <!-- 定义图标与文字 -->
                 <template #title>
-                  <div
-                    class="menu-img-default menu-img"
-                    :style="getIcon(item.icon)"
-                  ></div>
+                  <div class="menu-img-default menu-img" :style="getIcon(item.icon)"></div>
                   <span style="font-size: 0.25rem">{{ item.title }}</span>
                 </template>
+                <!-- 第二级菜单处理 -->
                 <template v-for="(subitem, subidx) in item.submenu">
                   <!-- 分两种情况，1.当用户是某大规则的管理员时（不包含总的管理者）只能看到按街道查询的内容，同时按街道查询下的内容只显示该规则的事件 -->
                   <!-- 2.当用户是普通浏览者或管理者时，既可以按街道查询，又可以按管理门类（大规则）查询；按街道查询时，显示该街道所有大规则的扣分；按管理门类查询时，显示该规则下所有街道的扣分 -->
-                  <el-sub-menu
-                    :index="idx + '-' + subidx"
-                    :key="idx + '-' + subidx"
-                    v-if="subitem.submenu && subitem.submenu.length && subitem.visible !== false"
-                  >
-                    <!-- 二级标题 -->
-                    <template #title>
-                      <span style="font-size: 0.20rem">{{
-                        subitem.title
-                      }}</span>
-                    </template>
-                    <el-menu-item
-                      v-for="(subsubitem, subsubidx) in subitem.submenu"
-                      :index="idx + '-' + subidx + '-' + subsubidx"
-                      :key="idx + '-' + subidx + '-' + subsubidx"
-                      @click="
-                        displayContentWithQuery(subsubitem.to, subsubitem.street, subsubitem.roles)
-                      "
+                  <!-- 判断是否有三级菜单 -->
+                  <template v-if="subitem.submenu && subitem.submenu.length && subitem.visible !== false">
+                    <el-sub-menu :index="idx + '-' + subidx" :key="idx + '-' + subidx">
+                      <template #title>
+                        <span style="font-size: 0.20rem">{{subitem.title}}</span> 
+                      </template>
+                      <template v-for="(subsubitem, subsubidx) in subitem.submenu">
+                        <template v-if="subsubitem.submenu && subsubitem.submenu.length && subsubitem.visible !== false">
+                          <el-sub-menu :index="idx +'-'+ subidx +'-'+ subsubidx" :key="idx +'-'+ subidx + '-' + subsubidx">
+                            <template #title>
+                              <span style="font-size: 0.20rem">{{subsubitem.title}}</span> 
+                            </template>
+                            <el-menu-item
+                              v-for="(subsubsubitem, subsubsubidx) in subsubitem.submenu"
+                              :index="idx + '-' + subidx + '-' + subsubidx + '-' + subsubsubidx"
+                              :key="idx + '-' + subidx + '-' + subsubidx + '-' + subsubsubidx"
+                              @click="
+                                displayContentWithQuery(subsubsubitem.to, subsubsubitem.street, subsubsubitem.roles)
+                              ">
+                              <span style="font-size: 0.15rem">{{subsubsubitem.title}}</span>
+                            </el-menu-item>
+                          </el-sub-menu>
+                        </template>
+                      </template>
+                    </el-sub-menu>
+                  </template>
+                  <template v-else>
+                    <!-- 为浏览者时不显示具体二级菜单项(即实现不显示体征事件导入) -->
+                    <el-menu-item v-if="params.role !== 'viewer'"
+                      :index="idx + '-' + subidx"
+                      :key="idx + '-' + subidx"
+                      @click="displayContent(subitem.to)"
                     >
-                      <!-- 三级标题 -->
-                      <span style="font-size: 0.15rem">{{
-                        subsubitem.title
-                      }}</span>
+                      <span style="font-size: 0.20rem">{{ subitem.title }}</span>
                     </el-menu-item>
-                  </el-sub-menu>
+                  </template>
+
                 </template>
               </el-sub-menu>
             </template>
@@ -199,13 +211,8 @@ function logout() {
   //TODO 清除登录信息
   router.push("/login");
 }
-
-// 这个应该从后台请求获得
-const menuList = [
-  {
-    icon: "02,14",
-    title: "体征事件查询",
-    to: "penaltyPoints",
+const menuList_submenu = [
+  { icon: "02,14",title: "体征事件查询",to: "penaltyPoints",
     submenu: [
       {
         icon: "",
@@ -348,6 +355,7 @@ const menuList = [
             roles: "扬尘治理",
             visible: params.role === "viewer" || params.role.includes("管理者"),
           },
+
           // {
           //   icon: "",
           //   title: "园林绿化",
@@ -443,14 +451,266 @@ const menuList = [
       },
     ],
   },
-  { icon: "03,17", title: "评分规则", to: "ruleConfig", submenu: [] },
-  { icon: "03,17", title: "体征分数录入", to: "subdivisionEntry", submenu: [] },
+  { icon: "03,17", title: "体征运行情况导入", to: "subdivisionEntry", submenu: [] },
+]
+
+// 这个应该从后台请求获得
+const menuList = [
+  { icon: "03,17", title: "体征运行规则", to: "ruleConfig", submenu: [] },
+  { icon: "03,17", title: "环境卫生", to: "", submenu: menuList_submenu },
+  { icon: "03,17", title: "市容秩序", to: "", submenu: menuList_submenu },
+  { icon: "03,17", title: "广告招牌", to: "", submenu: menuList_submenu },
+  { icon: "03,17", title: "扬尘治理", to: "", submenu: menuList_submenu },
+  { icon: "03,17", title: "固体废弃物处置及垃圾分类", to: "",submenu: menuList_submenu},
+  { icon: "03,17", title: "数字化常态监管", to: "", submenu: menuList_submenu },
+  { icon: "03,17", title: "网络理政", to: "", submenu: menuList_submenu },
+  { icon: "03,17", title: "油焑治理", to: "", submenu: menuList_submenu},
+  { icon: "03,17", title: "违法建设", to: "", submenu: menuList_submenu}
+  // { icon: "02,14",title: "体征事件查询",to: "penaltyPoints",
+  //   submenu: [
+  //     {
+  //       icon: "",
+  //       title: "按街道查询",
+  //       to: "",
+  //       visible: true,
+  //       submenu: [
+  //         { icon: "", title: "全区", to: "penaltyPoints" },
+  //         {
+  //           icon: "",
+  //           title: "抚琴街道",
+  //           to: "penaltyPoints",
+  //           street: "抚琴街道",
+  //           visible: true,
+  //         },
+  //         {
+  //           icon: "",
+  //           title: "西安路街道",
+  //           to: "penaltyPoints",
+  //           street: "西安路街道",
+  //           visible: true,
+  //         },
+  //         {
+  //           icon: "",
+  //           title: "驷马桥街道",
+  //           to: "penaltyPoints",
+  //           street: "驷马桥街道",
+  //           visible: true,
+  //         },
+  //         {
+  //           icon: "",
+  //           title: "荷花池街道",
+  //           to: "penaltyPoints",
+  //           street: "荷花池街道",
+  //           visible: true,
+  //         },
+  //         {
+  //           icon: "",
+  //           title: "五块石街道",
+  //           to: "penaltyPoints",
+  //           street: "五块石街道",
+  //           visible: true,
+  //         },
+  //         {
+  //           icon: "",
+  //           title: "九里堤街道",
+  //           to: "penaltyPoints",
+  //           street: "九里堤街道",
+  //           visible: true,
+  //         },
+  //         {
+  //           icon: "",
+  //           title: "营门口街道",
+  //           to: "penaltyPoints",
+  //           street: "营门口街道",
+  //           visible: true,
+  //         },
+  //         {
+  //           icon: "",
+  //           title: "茶店子街道",
+  //           to: "penaltyPoints",
+  //           street: "茶店子街道",
+  //           visible: true,
+  //         },
+  //         {
+  //           icon: "",
+  //           title: "金泉街道",
+  //           to: "penaltyPoints",
+  //           street: "金泉街道",
+  //           visible: true,
+  //         },
+  //         {
+  //           icon: "",
+  //           title: "沙河源街道",
+  //           to: "penaltyPoints",
+  //           street: "沙河源街道",
+  //           visible: true,
+  //         },
+  //         {
+  //           icon: "",
+  //           title: "天回镇街道",
+  //           to: "penaltyPoints",
+  //           street: "天回镇街道",
+  //           visible: true,
+  //         },
+  //         {
+  //           icon: "",
+  //           title: "西华街道",
+  //           to: "penaltyPoints",
+  //           street: "西华街道",
+  //           visible: true,
+  //         },
+  //         {
+  //           icon: "",
+  //           title: "凤凰山街道",
+  //           to: "penaltyPoints",
+  //           street: "凤凰山街道",
+  //           visible: true,
+  //         },
+  //       ],
+  //     },
+  //     {
+  //       icon: "",
+  //       title: "按管理门类查询",
+  //       to: "",
+  //       visible: params.role === "viewer" || params.role.includes("管理者"),
+  //       submenu: [
+  //         {
+  //           icon: "",
+  //           title: "环境卫生",
+  //           to: "penaltyPoints",
+  //           roles: "环境卫生",
+  //           visible: params.role === "viewer" || params.role.includes("管理者"),
+  //         },
+  //         {
+  //           icon: "",
+  //           title: "市容秩序",
+  //           to: "penaltyPoints",
+  //           roles: "市容秩序",
+  //           visible: params.role === "viewer" || params.role.includes("管理者"),
+  //         },
+  //         {
+  //           icon: "",
+  //           title: "执法案件办理",
+  //           to: "penaltyPoints",
+  //           roles: "执法案件办理",
+  //           visible: params.role === "viewer" || params.role.includes("管理者"),
+  //         },
+  //         {
+  //           icon: "",
+  //           title: "广告招牌",
+  //           to: "penaltyPoints",
+  //           roles: "广告招牌",
+  //           visible: params.role === "viewer" || params.role.includes("管理者"),
+  //         },
+  //         {
+  //           icon: "",
+  //           title: "扬尘治理",
+  //           to: "penaltyPoints",
+  //           roles: "扬尘治理",
+  //           visible: params.role === "viewer" || params.role.includes("管理者"),
+  //         },
+  //         // {
+  //         //   icon: "",
+  //         //   title: "园林绿化",
+  //         //   to: "penaltyPoints",
+  //         //   roles: "园林绿化",
+  //         //   visible: params.role === "viewer" || params.role.includes("管理者"),
+  //         // },
+  //         // {
+  //         //   icon: "",
+  //         //   title: "通讯设施治理",
+  //         //   to: "penaltyPoints",
+  //         //   roles: "通讯设施治理",
+  //         //   visible: params.role === "viewer" || params.role.includes("管理者"),
+  //         // },
+  //         // {
+  //         //   icon: "",
+  //         //   title: "河道沟渠环境治理",
+  //         //   to: "penaltyPoints",
+  //         //   roles: "河道沟渠环境治理",
+  //         //   visible: params.role === "viewer" || params.role.includes("管理者"),
+  //         // },
+  //         // {
+  //         //   icon: "",
+  //         //   title: "再生资源体系建设",
+  //         //   to: "penaltyPoints",
+  //         //   roles: "再生资源体系建设",
+  //         //   visible: params.role === "viewer" || params.role.includes("管理者"),
+  //         // },
+  //         // {
+  //         //   icon: "",
+  //         //   title: "工地治理",
+  //         //   to: "penaltyPoints",
+  //         //   roles: "工地治理",
+  //         //   visible: params.role === "viewer" || params.role.includes("管理者"),
+  //         // },
+  //         // {
+  //         //   icon: "",
+  //         //   title: "闲置地块脏乱差治理",
+  //         //   to: "penaltyPoints",
+  //         //   roles: "闲置地块脏乱差治理",
+  //         //   visible: params.role === "viewer" || params.role.includes("管理者"),
+  //         // },
+  //         // {
+  //         //   icon: "",
+  //         //   title: "油烟负面清单",
+  //         //   to: "penaltyPoints",
+  //         //   roles: "油烟负面清单",
+  //         //   visible: params.role === "viewer" || params.role.includes("管理者"),
+  //         // },
+  //         {
+  //           icon: "",
+  //           title: "固体废弃物处置及垃圾分类",
+  //           to: "penaltyPoints",
+  //           roles: "固体废弃物处置及垃圾分类",
+  //           visible: params.role === "viewer" || params.role.includes("管理者"),
+  //         },
+  //         {
+  //           icon: "",
+  //           title: "数字化常态监管",
+  //           to: "penaltyPoints",
+  //           roles: "数字化常态监管",
+  //           visible: params.role === "viewer" || params.role.includes("管理者"),
+  //         },
+  //         {
+  //           icon: "",
+  //           title: "网络理政",
+  //           to: "penaltyPoints",
+  //           roles: "网络理政",
+  //           visible: params.role === "viewer" || params.role.includes("管理者"),
+  //         },
+  //         {
+  //           icon: "",
+  //           title: "油烟治理",
+  //           to: "penaltyPoints",
+  //           roles: "油烟治理",
+  //           visible: params.role === "viewer" || params.role.includes("管理者"),
+  //         },
+  //         // {
+  //         //   icon: "",
+  //         //   title: "第三方测评",
+  //         //   to: "penaltyPoints",
+  //         //   roles: "第三方测评",
+  //         //   visible: params.role === "viewer" || params.role.includes("管理者"),
+  //         // },
+  //         // {
+  //         //   icon: "",
+  //         //   title: "领导小组综合评价",
+  //         //   to: "penaltyPoints",
+  //         //   roles: "领导小组综合评价",
+  //         //   visible: params.role === "viewer" || params.role.includes("管理者"),
+  //         // },
+  //       ],
+  //     },
+  //   ],
+  // },
+  // { icon: "03,17", title: "体征运行情况导入", to: "subdivisionEntry", submenu: [] },
 ];
 
-function displayContent(name) {
-  router.push({ name });
-}
 
+function displayContent(name) {
+  router.push({ name }); 
+}
 function displayContentWithQuery(name, street, roles) {
   if (roles != undefined && roles != "") {
     // 有roles参数，说明是按管理门类查询

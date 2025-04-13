@@ -56,10 +56,8 @@
     <div class="mainDiv">
       <div class="columns">
         <div class="panel bar">
-          <h2>金牛区各街道成绩排名</h2>
-
+          <h2>金牛区城乡环境综合治理整治成效分析</h2>
           <div id="horizontal_bar"></div>
-
           <div class="panel_footer"></div>
         </div>
         <!-- <div class="no">
@@ -158,7 +156,7 @@
           </div>
         </div> -->
         <div class="panel bar">
-          <h2>大项规则扣分排名</h2>
+          <h2>金牛区城乡环境综合整治薄弱环节分析</h2>
 
           <div id="horizontal_bar1"></div>
 
