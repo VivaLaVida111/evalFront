@@ -66,7 +66,6 @@
                 placeholder="选择月份"
                 format="YYYY-MM"
                 value-format="YYYY-MM"
-                :disabled-date="disabledMonth"
                 @change="handleMonthChange"
                 size="small"
                 style="width: 130px; height: 28px; font-size: 13px;"
@@ -1973,55 +1972,87 @@ const fontSizeSwitch = (res) => {
 /**
  * 横向柱形图1
  */
+ const selectedMonth = ref(moment().format("YYYY-MM")); // Default to current month
 var start = moment().startOf("month").format("YYYY-MM-DD");
 var end = moment().add(1, 'days').format("YYYY-MM-DD");;
 const scoresList = reactive([]);
 const streetsList = reactive([]);
 
+// Handler for when month selection changes
+const handleMonthChange = (value) => {
+  if (!value) {
+    // If value is cleared, default to current month
+    selectedMonth.value = moment().format("YYYY-MM");
+  }
+  
+  // Convert the selected month to start and end dates for API calls
+  const monthStart = moment(value).startOf('month').format("YYYY-MM-DD");
+  const monthEnd = moment(value).add(1, 'months').startOf('month').format("YYYY-MM-DD");
+  
+  // Update the date range for data queries
+  start = monthStart;
+  end = monthEnd;
+  
+  console.log(`Date range updated: ${start} to ${end}`);
+  
+  // Re-fetch data and update charts with the new date range
+  create_horizontal_bar();
+  create_horizontal_bar1();
+};
+
 const getScores = (startTime, endTime) => {
   var URL = "/api/details/score/" + startTime + "/" + endTime;
-  console.log("URL: ", URL);
+  console.log("Fetching scores for period:", startTime, "to", endTime);
+  
   return axios({
     url: URL,
     method: "get",
     headers: {
       Authorization: "Bearer" + params.token,
-      "Content-Type": " application/json",
+      "Content-Type": "application/json",
     },
   }).then(function (resp) {
     var data = resp.data.data;
-    console.log("getScores: ", data);
+    console.log("Retrieved scores data:", data);
+    
     scoresList.splice(0, scoresList.length);
     streetsList.splice(0, streetsList.length);
+    
     for (var key in data) {
       scoresList.push(data[key].score);
       streetsList.push(data[key].street);
     }
+  }).catch(error => {
+    console.error("Failed to fetch scores data:", error);
+    // Optionally show user-friendly error message
   });
 };
 
 const horizontalOpt = {
   xAxis: {
     max: "dataMax",
+    // 关闭x轴动画
+    animation: false
   },
   yAxis: {
     type: "category",
     data: streetsList,
     inverse: true,
-    animationDuration: 300,
-    animationDurationUpdate: 300,
-    max: 13, // only the largest 3 bars will be displayed
+    // 关闭动画
+    animationDuration: 0,
+    animationDurationUpdate: 0,
+    max: 13
   },
   series: [
     {
-      realtimeSort: true,
+      realtimeSort: false, // 关闭实时排序动画
       name: "街道",
       type: "bar",
       data: scoresList,
       label: {
         show: true,
         position: "right",
-        valueAnimation: true,
+        valueAnimation: false // 关闭标签值的动画
       },
     },
   ],
@@ -2031,8 +2062,10 @@ const horizontalOpt = {
   grid: {
     left: "15%",
   },
+  // 关闭所有动画
+  animation: false,
   animationDuration: 0,
-  animationDurationUpdate: 3000,
+  animationDurationUpdate: 0,
   animationEasing: "linear",
   animationEasingUpdate: "linear",
 };
@@ -2041,21 +2074,26 @@ let horizontalBar = null;
 const create_horizontal_bar = async () => {
   try {
     let chartDom = document.getElementById("horizontal_bar");
-    //初始化图表
     horizontalBar = echarts.init(chartDom);
-    // category_chart.on("click", (params) => {
-    //   console.log("params:" + params.data.name);
-    // });
-    // getScores修改了streetList和scoresList
+    
     await getScores(start, end);
-
-    console.log("streetList: ", streetsList);
-    console.log("scoresList: ", scoresList);
-    horizontalOpt.yAxis.data = streetsList;
-    horizontalOpt.series[0].data = scoresList;
-    //绘制图表
+    
+    // 根据分数排序数据（从高到低排序）
+    const combinedData = streetsList.map((street, index) => ({
+      street: street,
+      score: scoresList[index]
+    }));
+    
+    combinedData.sort((a, b) => b.score - a.score); // 倒序排序
+    
+    // 重新提取排序后的数据
+    const sortedStreets = combinedData.map(item => item.street);
+    const sortedScores = combinedData.map(item => item.score);
+    
+    horizontalOpt.yAxis.data = sortedStreets;
+    horizontalOpt.series[0].data = sortedScores;
+    
     horizontalBar.setOption(horizontalOpt);
-    //horizontalBar.resize();
     window.addEventListener("resize", horizontalBar.resize);
   } catch (error) {
     console.error("Failed to create horizontal bar chart:", error);
@@ -2068,52 +2106,57 @@ const bigRulsList = reactive([]);
 const demeritList = reactive([]);
 const getStatistics = (startTime, endTime) => {
   var URL = "/api/details/bigRulesStatistics/" + startTime + "/" + endTime;
-  console.log("URL: ", URL);
+  console.log("Fetching statistics for period:", startTime, "to", endTime);
+  
   return axios({
     url: URL,
     method: "get",
     headers: {
       Authorization: "Bearer" + params.token,
-      "Content-Type": " application/json",
+      "Content-Type": "application/json",
     },
   }).then(function (resp) {
     var data = resp.data.data;
-    console.log("getStatistics: ", data);
+    console.log("Retrieved statistics data:", data);
+    
     bigRulesStatistics.splice(0, bigRulesStatistics.length);
     bigRulsList.splice(0, bigRulsList.length);
     demeritList.splice(0, demeritList.length);
+    
     for (var key in data) {
       bigRulesStatistics.push(data[key]);
       bigRulsList.push(data[key].item);
       demeritList.push(Math.abs(data[key].score));
     }
-    //console.log("bigRulesStatistics: ", bigRulesStatistics);
+  }).catch(error => {
+    console.error("Failed to fetch statistics data:", error);
+    // Optionally show user-friendly error message
   });
 };
 
 const horizontalOpt1 = {
   xAxis: {
     max: "dataMax",
+    animation: false
   },
   yAxis: {
     type: "category",
     data: bigRulsList,
     inverse: true,
-    animationDuration: 300,
-    animationDurationUpdate: 300,
-    max: 13, // only the largest 3 bars will be displayed
-    
+    animationDuration: 0,
+    animationDurationUpdate: 0,
+    max: 13,
   },
   series: [
     {
-      realtimeSort: true,
+      realtimeSort: false,
       name: "大项规则",
       type: "bar",
       data: demeritList,
       label: {
         show: true,
         position: "right",
-        valueAnimation: true,
+        valueAnimation: false
       },
     },
   ],
@@ -2123,8 +2166,9 @@ const horizontalOpt1 = {
   grid: {
     left: "17%",
   },
+  animation: false,
   animationDuration: 0,
-  animationDurationUpdate: 3000,
+  animationDurationUpdate: 0,
   animationEasing: "linear",
   animationEasingUpdate: "linear",
 };
@@ -2176,21 +2220,26 @@ let horizontalBar1 = null;
 const create_horizontal_bar1 = async () => {
   try {
     let chartDom = document.getElementById("horizontal_bar1");
-    //初始化图表
     horizontalBar1 = echarts.init(chartDom);
-    // category_chart.on("click", (params) => {
-    //   console.log("params:" + params.data.name);
-    // });
-    // getScores修改了streetList和scoresList
+    
     await getStatistics(start, end);
-
-    console.log("bigRulsList: ", bigRulsList);
-    console.log("demeritList: ", demeritList);
-    horizontalOpt1.yAxis.data = bigRulsList;
-    horizontalOpt1.series[0].data = demeritList;
-    //绘制图表
+    
+    // 根据分数排序数据（从高到低排序）
+    const combinedData = bigRulsList.map((rule, index) => ({
+      rule: rule,
+      demerit: demeritList[index]
+    }));
+    
+    combinedData.sort((a, b) => b.demerit - a.demerit); // 倒序排序
+    
+    // 重新提取排序后的数据
+    const sortedRules = combinedData.map(item => item.rule);
+    const sortedDemerits = combinedData.map(item => item.demerit);
+    
+    horizontalOpt1.yAxis.data = sortedRules;
+    horizontalOpt1.series[0].data = sortedDemerits;
+    
     horizontalBar1.setOption(horizontalOpt1);
-    //horizontalBar.resize();
     createPieChart();
     window.addEventListener("resize", horizontalBar1.resize);
   } catch (error) {
