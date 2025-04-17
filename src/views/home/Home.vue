@@ -59,61 +59,63 @@
           <h2>金牛区城乡环境综合治理整治成效分析</h2>
 
           <!-- 紧凑布局的选择器区域 -->
-          <div style="margin: 0; padding: 0; line-height: 1;">
+          <div style="margin: 0; padding: 0; line-height: 1">
             <el-date-picker
-                v-model="selectedMonth"
-                type="month"
-                placeholder="选择月份"
-                format="YYYY-MM"
-                value-format="YYYY-MM"
-                @change="handleMonthChange"
-                size="small"
-                style="width: 130px; height: 28px; font-size: 13px;"
+              v-model="selectedMonth"
+              type="month"
+              placeholder="选择月份"
+              format="YYYY-MM"
+              value-format="YYYY-MM"
+              @change="handleMonthChange"
+              size="small"
+              style="width: 130px; height: 28px; font-size: 13px"
             />
           </div>
 
           <div id="horizontal_bar"></div>
           <div class="panel_footer"></div>
         </div>
-        <!-- <div class="no">
-          <div
-            style="
-              color: rgb(125, 210, 236);
-              margin-bottom: -0.5vw;
-              text-align: center;
-              font-size: 16px;
-            "
-          >
-            餐厨垃圾
-          </div>
-          <div class="no-hd">
-            <ul>
-              <li>{{ Number(total_hongxing).toFixed(2) }}</li>
-              <li>{{ Number(total_xihua).toFixed(2) }}</li>
-            </ul>
-          </div>
-          <div class="no-bd">
-            <ul>
-              <li>当月收运量累计（吨）</li>
-              <li>当日收运量累计（吨）</li>
-            </ul>
-          </div>
-        </div> -->
       </div>
       <div class="columns">
         <div class="no">
           <div class="no-hd">
             <ul>
+              <!-- 第一行显示前5个数据的分数 -->
               <li
                 v-for="(rule, index) in bigRulesStatistics.slice(0, 5)"
-                :key="index"
+                :key="'score-' + index"
               >
                 {{ rule.score }}
               </li>
+            </ul>
+          </div>
+          <div class="no-bd">
+            <ul>
+              <!-- 第一行显示前5个数据的项目名 -->
               <li
-                v-if="bigRulesStatistics.length < 5"
-                v-for="index in 5 - bigRulesStatistics.length"
-                :key="'empty-' + index"
+                v-for="(rule, index) in bigRulesStatistics.slice(0, 5)"
+                :key="'item-' + index"
+              >
+                {{ rule.item }}
+              </li>
+            </ul>
+          </div>
+
+          <!-- 添加第二行数据 -->
+          <div class="no-hd">
+            <ul>
+              <!-- 第二行显示后4个数据的分数 -->
+              <li
+                v-for="(rule, index) in bigRulesStatistics.slice(5, 9)"
+                :key="'score2-' + index"
+              >
+                {{ rule.score }}
+              </li>
+              <!-- 如果不足9个数据，用空白补齐到4个位置 -->
+              <li
+                v-if="bigRulesStatistics.length < 9"
+                v-for="index in 9 - Math.max(bigRulesStatistics.length, 5)"
+                :key="'empty-score-' + index"
               >
                 0
               </li>
@@ -121,18 +123,20 @@
           </div>
           <div class="no-bd">
             <ul>
+              <!-- 第二行显示后4个数据的项目名 -->
               <li
-                v-for="(rule, index) in bigRulesStatistics.slice(0, 5)"
-                :key="index"
+                v-for="(rule, index) in bigRulesStatistics.slice(5, 9)"
+                :key="'item2-' + index"
               >
                 {{ rule.item }}
               </li>
+              <!-- 如果不足9个数据，用默认文本补齐到4个位置 -->
               <li
-                v-if="bigRulesStatistics.length < 5"
-                v-for="index in 5 - bigRulesStatistics.length"
-                :key="'empty-' + index"
+                v-if="bigRulesStatistics.length < 9"
+                v-for="index in 9 - Math.max(bigRulesStatistics.length, 5)"
+                :key="'empty-item-' + index"
               >
-                数据{{ index + 1  }}
+                数据{{ index + 5 }}
               </li>
             </ul>
           </div>
@@ -175,7 +179,7 @@
 
           <div id="horizontal_bar1"></div>
 
-          <div id="pie_chart" style="height: 150px; margin-top: 10px;"></div>
+          <div id="pie_chart" style="height: 150px; margin-top: 10px"></div>
 
           <div class="panel_footer"></div>
         </div>
@@ -1971,9 +1975,9 @@ const fontSizeSwitch = (res) => {
 /**
  * 横向柱形图1
  */
- const selectedMonth = ref(moment().format("YYYY-MM")); // Default to current month
+const selectedMonth = ref(moment().format("YYYY-MM")); // Default to current month
 var start = moment().startOf("month").format("YYYY-MM-DD");
-var end = moment().add(1, 'days').format("YYYY-MM-DD");;
+var end = moment().add(1, "days").format("YYYY-MM-DD");
 const scoresList = reactive([]);
 const streetsList = reactive([]);
 
@@ -1983,17 +1987,20 @@ const handleMonthChange = (value) => {
     // If value is cleared, default to current month
     selectedMonth.value = moment().format("YYYY-MM");
   }
-  
+
   // Convert the selected month to start and end dates for API calls
-  const monthStart = moment(value).startOf('month').format("YYYY-MM-DD");
-  const monthEnd = moment(value).add(1, 'months').startOf('month').format("YYYY-MM-DD");
-  
+  const monthStart = moment(value).startOf("month").format("YYYY-MM-DD");
+  const monthEnd = moment(value)
+    .add(1, "months")
+    .startOf("month")
+    .format("YYYY-MM-DD");
+
   // Update the date range for data queries
   start = monthStart;
   end = monthEnd;
-  
+
   console.log(`Date range updated: ${start} to ${end}`);
-  
+
   // Re-fetch data and update charts with the new date range
   create_horizontal_bar();
   create_horizontal_bar1();
@@ -2002,7 +2009,7 @@ const handleMonthChange = (value) => {
 const getScores = (startTime, endTime) => {
   var URL = "/api/details/score/" + startTime + "/" + endTime;
   console.log("Fetching scores for period:", startTime, "to", endTime);
-  
+
   return axios({
     url: URL,
     method: "get",
@@ -2010,28 +2017,30 @@ const getScores = (startTime, endTime) => {
       Authorization: "Bearer" + params.token,
       "Content-Type": "application/json",
     },
-  }).then(function (resp) {
-    var data = resp.data.data;
-    console.log("Retrieved scores data:", data);
-    
-    scoresList.splice(0, scoresList.length);
-    streetsList.splice(0, streetsList.length);
-    
-    for (var key in data) {
-      scoresList.push(data[key].score);
-      streetsList.push(data[key].street);
-    }
-  }).catch(error => {
-    console.error("Failed to fetch scores data:", error);
-    // Optionally show user-friendly error message
-  });
+  })
+    .then(function (resp) {
+      var data = resp.data.data;
+      console.log("Retrieved scores data:", data);
+
+      scoresList.splice(0, scoresList.length);
+      streetsList.splice(0, streetsList.length);
+
+      for (var key in data) {
+        scoresList.push(data[key].score);
+        streetsList.push(data[key].street);
+      }
+    })
+    .catch((error) => {
+      console.error("Failed to fetch scores data:", error);
+      // Optionally show user-friendly error message
+    });
 };
 
 const horizontalOpt = {
   xAxis: {
     max: "dataMax",
     // 关闭x轴动画
-    animation: false
+    animation: false,
   },
   yAxis: {
     type: "category",
@@ -2040,7 +2049,7 @@ const horizontalOpt = {
     // 关闭动画
     animationDuration: 0,
     animationDurationUpdate: 0,
-    max: 13
+    max: 13,
   },
   series: [
     {
@@ -2051,7 +2060,7 @@ const horizontalOpt = {
       label: {
         show: true,
         position: "right",
-        valueAnimation: false // 关闭标签值的动画
+        valueAnimation: false, // 关闭标签值的动画
       },
     },
   ],
@@ -2074,24 +2083,24 @@ const create_horizontal_bar = async () => {
   try {
     let chartDom = document.getElementById("horizontal_bar");
     horizontalBar = echarts.init(chartDom);
-    
+
     await getScores(start, end);
-    
+
     // 根据分数排序数据（从高到低排序）
     const combinedData = streetsList.map((street, index) => ({
       street: street,
-      score: scoresList[index]
+      score: scoresList[index],
     }));
-    
+
     combinedData.sort((a, b) => b.score - a.score); // 倒序排序
-    
+
     // 重新提取排序后的数据
-    const sortedStreets = combinedData.map(item => item.street);
-    const sortedScores = combinedData.map(item => item.score);
-    
+    const sortedStreets = combinedData.map((item) => item.street);
+    const sortedScores = combinedData.map((item) => item.score);
+
     horizontalOpt.yAxis.data = sortedStreets;
     horizontalOpt.series[0].data = sortedScores;
-    
+
     horizontalBar.setOption(horizontalOpt);
     window.addEventListener("resize", horizontalBar.resize);
   } catch (error) {
@@ -2106,7 +2115,7 @@ const demeritList = reactive([]);
 const getStatistics = (startTime, endTime) => {
   var URL = "/api/details/bigRulesStatistics/" + startTime + "/" + endTime;
   console.log("Fetching statistics for period:", startTime, "to", endTime);
-  
+
   return axios({
     url: URL,
     method: "get",
@@ -2114,29 +2123,31 @@ const getStatistics = (startTime, endTime) => {
       Authorization: "Bearer" + params.token,
       "Content-Type": "application/json",
     },
-  }).then(function (resp) {
-    var data = resp.data.data;
-    console.log("Retrieved statistics data:", data);
-    
-    bigRulesStatistics.splice(0, bigRulesStatistics.length);
-    bigRulsList.splice(0, bigRulsList.length);
-    demeritList.splice(0, demeritList.length);
-    
-    for (var key in data) {
-      bigRulesStatistics.push(data[key]);
-      bigRulsList.push(data[key].item);
-      demeritList.push(Math.abs(data[key].score));
-    }
-  }).catch(error => {
-    console.error("Failed to fetch statistics data:", error);
-    // Optionally show user-friendly error message
-  });
+  })
+    .then(function (resp) {
+      var data = resp.data.data;
+      console.log("Retrieved statistics data:", data);
+
+      bigRulesStatistics.splice(0, bigRulesStatistics.length);
+      bigRulsList.splice(0, bigRulsList.length);
+      demeritList.splice(0, demeritList.length);
+
+      for (var key in data) {
+        bigRulesStatistics.push(data[key]);
+        bigRulsList.push(data[key].item);
+        demeritList.push(Math.abs(data[key].score));
+      }
+    })
+    .catch((error) => {
+      console.error("Failed to fetch statistics data:", error);
+      // Optionally show user-friendly error message
+    });
 };
 
 const horizontalOpt1 = {
   xAxis: {
     max: "dataMax",
-    animation: false
+    animation: false,
   },
   yAxis: {
     type: "category",
@@ -2155,7 +2166,7 @@ const horizontalOpt1 = {
       label: {
         show: true,
         position: "right",
-        valueAnimation: false
+        valueAnimation: false,
       },
     },
   ],
@@ -2220,24 +2231,24 @@ const create_horizontal_bar1 = async () => {
   try {
     let chartDom = document.getElementById("horizontal_bar1");
     horizontalBar1 = echarts.init(chartDom);
-    
+
     await getStatistics(start, end);
-    
+
     // 根据分数排序数据（从高到低排序）
     const combinedData = bigRulsList.map((rule, index) => ({
       rule: rule,
-      demerit: demeritList[index]
+      demerit: demeritList[index],
     }));
-    
+
     combinedData.sort((a, b) => b.demerit - a.demerit); // 倒序排序
-    
+
     // 重新提取排序后的数据
-    const sortedRules = combinedData.map(item => item.rule);
-    const sortedDemerits = combinedData.map(item => item.demerit);
-    
+    const sortedRules = combinedData.map((item) => item.rule);
+    const sortedDemerits = combinedData.map((item) => item.demerit);
+
     horizontalOpt1.yAxis.data = sortedRules;
     horizontalOpt1.series[0].data = sortedDemerits;
-    
+
     horizontalBar1.setOption(horizontalOpt1);
     createPieChart();
     window.addEventListener("resize", horizontalBar1.resize);
@@ -2245,7 +2256,6 @@ const create_horizontal_bar1 = async () => {
     console.error("Failed to create horizontal bar chart:", error);
   }
 };
-
 
 // ======================================================================================================sunny
 /**
@@ -2291,6 +2301,7 @@ function trim(ele) {
 onMounted(() => {
   create_horizontal_bar();
   create_horizontal_bar1();
+  createPieChart();
 });
 function handleClick() {
   // setTimeout(() => {
@@ -2300,6 +2311,7 @@ function handleClick() {
 
 setInterval(create_horizontal_bar, 60 * 60 * 1000);
 setInterval(create_horizontal_bar1, 60 * 60 * 1000);
+setInterval(createPieChart, 60 * 60 * 1000);
 // getTianfuList(1);
 // getRenheList(1);
 
@@ -2329,6 +2341,11 @@ onBeforeUnmount(() => {
   if (horizontalBar1) {
     horizontalBar1.dispose();
     horizontalBar1 = null;
+  }
+  window.removeEventListener("resize", pieChart.resize);
+  if (pieChart) {
+    pieChart.dispose();
+    pieChart = null;
   }
   // window.removeEventListener("resize", tianfu_chart.resize);
   // if (tianfu_chart) {
@@ -2719,8 +2736,8 @@ li {
 }
 
 #pie_chart {
-  height: 3rem;         /* 饼图也压缩一点高度 */
-  margin-top: 0.5rem;   /* 紧贴柱状图 */
+  height: 3rem; /* 饼图也压缩一点高度 */
+  margin-top: 0.5rem; /* 紧贴柱状图 */
   width: 100%;
 }
 
