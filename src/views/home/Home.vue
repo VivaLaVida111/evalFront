@@ -78,14 +78,16 @@
       </div>
       <div class="columns">
         <div class="no">
+          <h2 style="font-size: 0.2rem; color: #ffffff;">整治成效：好</h2>
           <div class="no-hd">
             <ul>
               <!-- 第一行显示前5个数据的分数 -->
               <li
                 v-for="(rule, index) in bigRulesStatistics.slice(0, 5)"
                 :key="'score-' + index"
+                @click="toPenalty(rule.item)"
               >
-                {{ rule.score }}
+                {{ parseFloat(rule.score).toFixed(2) }}
               </li>
             </ul>
           </div>
@@ -108,8 +110,9 @@
               <li
                 v-for="(rule, index) in bigRulesStatistics.slice(5, 9)"
                 :key="'score2-' + index"
+                @click="toPenalty(rule.item)"
               >
-                {{ rule.score }}
+                {{ parseFloat(rule.score).toFixed(2) }}
               </li>
               <!-- 如果不足9个数据，用空白补齐到4个位置 -->
               <li
@@ -1953,6 +1956,16 @@ function goback() {
 }
 function toHome() {
   router.push("/content");
+}
+
+function toPenalty(rule) {
+  if (!params.role.includes("管理者") && params.role != "viewer" && !params.role.includes(rule)) {
+    ElMessage.error("没有权限访问！");
+    return;
+  }
+  // let url = "/content/penaltyPoints?roles=" + rule;
+  // router.push(url);
+  router.push({ path: "/content/penaltyPoints", query: { roles: rule } });
 }
 
 // ======================================================================================================sunny

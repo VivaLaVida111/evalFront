@@ -127,3 +127,67 @@ export function formatLocalDateTime() {
     const seconds = String(date.getSeconds()).padStart(2, '0');
     return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
 }
+
+// Case Record API functions
+export function addCaseRecord(data) {
+    return request({
+        url: '/case-record',
+        method: 'post',
+        data
+    })
+}
+
+export function getCaseRecords(params) {
+    return request({
+        url: '/case-record',
+        method: 'get',
+        params
+    })
+}
+
+export function updateCaseRecord(data) {
+    return request({
+        url: '/case-record',
+        method: 'patch',
+        data
+    })
+}
+
+export function deleteCaseRecord(id) {
+    return request({
+        url: '/case-record/' + id,
+        method: 'delete'
+    })
+}
+
+// Inspection Record API functions
+export function addInspectionRecord(data) {
+    return request({
+        url: '/inspection-record',
+        method: 'post',
+        data
+    })
+}
+
+export function getInspectionRecords(params) {
+    return request({
+        url: '/inspection-record',
+        method: 'get',
+        params
+    })
+}
+
+export function updateInspectionRecord(data) {
+    return request({
+        url: '/inspection-record',
+        method: 'patch',
+        data
+    })
+}
+
+export function deleteInspectionRecord(id) {
+    return request({
+        url: '/inspection-record/' + id,
+        method: 'delete'
+    })
+}

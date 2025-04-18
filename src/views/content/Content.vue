@@ -58,7 +58,7 @@
     </Header>
 
     <el-container class="data-container">
-      <el-aside>
+      <el-aside width="430px">
         <el-menu class="menu" default-active="1">
           <!-- 第一级菜单处理 -->
           <template v-for="(item, idx) in menuList">
@@ -168,9 +168,11 @@ function toSystem(item) {
 }
 //部门列表, 从后端获取
 onMounted(() => {
-  // 默认跳转到jinniu子组件
-  //router.push("/content/penaltyPoints");
-  router.push({ path: "/content/penaltyPoints", query: { roles: params.role } });
+  // 只有当我们处于基本内容路径且没有子路由时才重定向
+  if (route.path === "/content") {
+    router.push({ path: "/content/penaltyPoints", query: { roles: params.role } });
+  }
+  // 否则，保留现有路由和参数
 });
 
 // 系统列表
@@ -314,47 +316,47 @@ const menuList_submenu = [
           },
         ],
       },
-      {
-        icon: "",
-        title: "按管理门类查询",
-        to: "",
-        visible: params.role === "viewer" || params.role.includes("管理者"),
-        submenu: [
-          {
-            icon: "",
-            title: "环境卫生",
-            to: "penaltyPoints",
-            roles: "环境卫生",
-            visible: params.role === "viewer" || params.role.includes("管理者"),
-          },
-          {
-            icon: "",
-            title: "市容秩序",
-            to: "penaltyPoints",
-            roles: "市容秩序",
-            visible: params.role === "viewer" || params.role.includes("管理者"),
-          },
-          {
-            icon: "",
-            title: "执法案件办理",
-            to: "penaltyPoints",
-            roles: "执法案件办理",
-            visible: params.role === "viewer" || params.role.includes("管理者"),
-          },
-          {
-            icon: "",
-            title: "广告招牌",
-            to: "penaltyPoints",
-            roles: "广告招牌",
-            visible: params.role === "viewer" || params.role.includes("管理者"),
-          },
-          {
-            icon: "",
-            title: "扬尘治理",
-            to: "penaltyPoints",
-            roles: "扬尘治理",
-            visible: params.role === "viewer" || params.role.includes("管理者"),
-          },
+      // {
+      //   icon: "",
+      //   title: "按管理门类查询",
+      //   to: "",
+      //   visible: params.role === "viewer" || params.role.includes("管理者"),
+      //   submenu: [
+      //     {
+      //       icon: "",
+      //       title: "环境卫生",
+      //       to: "penaltyPoints",
+      //       roles: "环境卫生",
+      //       visible: params.role === "viewer" || params.role.includes("管理者"),
+      //     },
+      //     {
+      //       icon: "",
+      //       title: "市容秩序",
+      //       to: "penaltyPoints",
+      //       roles: "市容秩序",
+      //       visible: params.role === "viewer" || params.role.includes("管理者"),
+      //     },
+      //     {
+      //       icon: "",
+      //       title: "执法案件办理",
+      //       to: "penaltyPoints",
+      //       roles: "执法案件办理",
+      //       visible: params.role === "viewer" || params.role.includes("管理者"),
+      //     },
+      //     {
+      //       icon: "",
+      //       title: "广告招牌",
+      //       to: "penaltyPoints",
+      //       roles: "广告招牌",
+      //       visible: params.role === "viewer" || params.role.includes("管理者"),
+      //     },
+      //     {
+      //       icon: "",
+      //       title: "扬尘治理",
+      //       to: "penaltyPoints",
+      //       roles: "扬尘治理",
+      //       visible: params.role === "viewer" || params.role.includes("管理者"),
+      //     },
 
           // {
           //   icon: "",
@@ -405,34 +407,34 @@ const menuList_submenu = [
           //   roles: "油烟负面清单",
           //   visible: params.role === "viewer" || params.role.includes("管理者"),
           // },
-          {
-            icon: "",
-            title: "固体废弃物处置及垃圾分类",
-            to: "penaltyPoints",
-            roles: "固体废弃物处置及垃圾分类",
-            visible: params.role === "viewer" || params.role.includes("管理者"),
-          },
-          {
-            icon: "",
-            title: "数字化常态监管",
-            to: "penaltyPoints",
-            roles: "数字化常态监管",
-            visible: params.role === "viewer" || params.role.includes("管理者"),
-          },
-          {
-            icon: "",
-            title: "网络理政",
-            to: "penaltyPoints",
-            roles: "网络理政",
-            visible: params.role === "viewer" || params.role.includes("管理者"),
-          },
-          {
-            icon: "",
-            title: "油烟治理",
-            to: "penaltyPoints",
-            roles: "油烟治理",
-            visible: params.role === "viewer" || params.role.includes("管理者"),
-          },
+          // {
+          //   icon: "",
+          //   title: "固体废弃物处置及垃圾分类",
+          //   to: "penaltyPoints",
+          //   roles: "固体废弃物处置及垃圾分类",
+          //   visible: params.role === "viewer" || params.role.includes("管理者"),
+          // },
+          // {
+          //   icon: "",
+          //   title: "数字化常态监管",
+          //   to: "penaltyPoints",
+          //   roles: "数字化常态监管",
+          //   visible: params.role === "viewer" || params.role.includes("管理者"),
+          // },
+          // {
+          //   icon: "",
+          //   title: "网络理政",
+          //   to: "penaltyPoints",
+          //   roles: "网络理政",
+          //   visible: params.role === "viewer" || params.role.includes("管理者"),
+          // },
+          // {
+          //   icon: "",
+          //   title: "油烟治理",
+          //   to: "penaltyPoints",
+          //   roles: "油烟治理",
+          //   visible: params.role === "viewer" || params.role.includes("管理者"),
+          // },
           // {
           //   icon: "",
           //   title: "第三方测评",
@@ -447,11 +449,18 @@ const menuList_submenu = [
           //   roles: "领导小组综合评价",
           //   visible: params.role === "viewer" || params.role.includes("管理者"),
           // },
-        ],
-      },
+      //   ],
+      // },
     ],
   },
   { icon: "03,17", title: "体征运行情况导入", to: "subdivisionEntry", submenu: [] },
+]
+
+// 为扬尘治理模块创建特殊的子菜单，包含案件办理选项
+const menuList_submenu_dust = [
+  ...menuList_submenu,  // 展开现有的所有子菜单项
+  { icon: "03,17", title: "案件办理", to: "caseHandling", submenu: [] },
+  { icon: "03,17", title: "巡查登记", to: "inspectionRegistry", submenu: [] }
 ]
 
 // 这个应该从后台请求获得
@@ -460,251 +469,13 @@ const menuList = [
   { icon: "03,17", title: "环境卫生", to: "", submenu: menuList_submenu },
   { icon: "03,17", title: "市容秩序", to: "", submenu: menuList_submenu },
   { icon: "03,17", title: "广告招牌", to: "", submenu: menuList_submenu },
-  { icon: "03,17", title: "扬尘治理", to: "", submenu: menuList_submenu },
+  { icon: "03,17", title: "扬尘治理", to: "", submenu: menuList_submenu_dust },
   { icon: "03,17", title: "固体废弃物处置及垃圾分类", to: "",submenu: menuList_submenu},
   { icon: "03,17", title: "数字化常态监管", to: "", submenu: menuList_submenu },
   { icon: "03,17", title: "网络理政", to: "", submenu: menuList_submenu },
-  { icon: "03,17", title: "油焑治理", to: "", submenu: menuList_submenu},
+  { icon: "03,17", title: "油烟治理", to: "", submenu: menuList_submenu},
   { icon: "03,17", title: "违法建设", to: "", submenu: menuList_submenu}
-  // { icon: "02,14",title: "体征事件查询",to: "penaltyPoints",
-  //   submenu: [
-  //     {
-  //       icon: "",
-  //       title: "按街道查询",
-  //       to: "",
-  //       visible: true,
-  //       submenu: [
-  //         { icon: "", title: "全区", to: "penaltyPoints" },
-  //         {
-  //           icon: "",
-  //           title: "抚琴街道",
-  //           to: "penaltyPoints",
-  //           street: "抚琴街道",
-  //           visible: true,
-  //         },
-  //         {
-  //           icon: "",
-  //           title: "西安路街道",
-  //           to: "penaltyPoints",
-  //           street: "西安路街道",
-  //           visible: true,
-  //         },
-  //         {
-  //           icon: "",
-  //           title: "驷马桥街道",
-  //           to: "penaltyPoints",
-  //           street: "驷马桥街道",
-  //           visible: true,
-  //         },
-  //         {
-  //           icon: "",
-  //           title: "荷花池街道",
-  //           to: "penaltyPoints",
-  //           street: "荷花池街道",
-  //           visible: true,
-  //         },
-  //         {
-  //           icon: "",
-  //           title: "五块石街道",
-  //           to: "penaltyPoints",
-  //           street: "五块石街道",
-  //           visible: true,
-  //         },
-  //         {
-  //           icon: "",
-  //           title: "九里堤街道",
-  //           to: "penaltyPoints",
-  //           street: "九里堤街道",
-  //           visible: true,
-  //         },
-  //         {
-  //           icon: "",
-  //           title: "营门口街道",
-  //           to: "penaltyPoints",
-  //           street: "营门口街道",
-  //           visible: true,
-  //         },
-  //         {
-  //           icon: "",
-  //           title: "茶店子街道",
-  //           to: "penaltyPoints",
-  //           street: "茶店子街道",
-  //           visible: true,
-  //         },
-  //         {
-  //           icon: "",
-  //           title: "金泉街道",
-  //           to: "penaltyPoints",
-  //           street: "金泉街道",
-  //           visible: true,
-  //         },
-  //         {
-  //           icon: "",
-  //           title: "沙河源街道",
-  //           to: "penaltyPoints",
-  //           street: "沙河源街道",
-  //           visible: true,
-  //         },
-  //         {
-  //           icon: "",
-  //           title: "天回镇街道",
-  //           to: "penaltyPoints",
-  //           street: "天回镇街道",
-  //           visible: true,
-  //         },
-  //         {
-  //           icon: "",
-  //           title: "西华街道",
-  //           to: "penaltyPoints",
-  //           street: "西华街道",
-  //           visible: true,
-  //         },
-  //         {
-  //           icon: "",
-  //           title: "凤凰山街道",
-  //           to: "penaltyPoints",
-  //           street: "凤凰山街道",
-  //           visible: true,
-  //         },
-  //       ],
-  //     },
-  //     {
-  //       icon: "",
-  //       title: "按管理门类查询",
-  //       to: "",
-  //       visible: params.role === "viewer" || params.role.includes("管理者"),
-  //       submenu: [
-  //         {
-  //           icon: "",
-  //           title: "环境卫生",
-  //           to: "penaltyPoints",
-  //           roles: "环境卫生",
-  //           visible: params.role === "viewer" || params.role.includes("管理者"),
-  //         },
-  //         {
-  //           icon: "",
-  //           title: "市容秩序",
-  //           to: "penaltyPoints",
-  //           roles: "市容秩序",
-  //           visible: params.role === "viewer" || params.role.includes("管理者"),
-  //         },
-  //         {
-  //           icon: "",
-  //           title: "执法案件办理",
-  //           to: "penaltyPoints",
-  //           roles: "执法案件办理",
-  //           visible: params.role === "viewer" || params.role.includes("管理者"),
-  //         },
-  //         {
-  //           icon: "",
-  //           title: "广告招牌",
-  //           to: "penaltyPoints",
-  //           roles: "广告招牌",
-  //           visible: params.role === "viewer" || params.role.includes("管理者"),
-  //         },
-  //         {
-  //           icon: "",
-  //           title: "扬尘治理",
-  //           to: "penaltyPoints",
-  //           roles: "扬尘治理",
-  //           visible: params.role === "viewer" || params.role.includes("管理者"),
-  //         },
-  //         // {
-  //         //   icon: "",
-  //         //   title: "园林绿化",
-  //         //   to: "penaltyPoints",
-  //         //   roles: "园林绿化",
-  //         //   visible: params.role === "viewer" || params.role.includes("管理者"),
-  //         // },
-  //         // {
-  //         //   icon: "",
-  //         //   title: "通讯设施治理",
-  //         //   to: "penaltyPoints",
-  //         //   roles: "通讯设施治理",
-  //         //   visible: params.role === "viewer" || params.role.includes("管理者"),
-  //         // },
-  //         // {
-  //         //   icon: "",
-  //         //   title: "河道沟渠环境治理",
-  //         //   to: "penaltyPoints",
-  //         //   roles: "河道沟渠环境治理",
-  //         //   visible: params.role === "viewer" || params.role.includes("管理者"),
-  //         // },
-  //         // {
-  //         //   icon: "",
-  //         //   title: "再生资源体系建设",
-  //         //   to: "penaltyPoints",
-  //         //   roles: "再生资源体系建设",
-  //         //   visible: params.role === "viewer" || params.role.includes("管理者"),
-  //         // },
-  //         // {
-  //         //   icon: "",
-  //         //   title: "工地治理",
-  //         //   to: "penaltyPoints",
-  //         //   roles: "工地治理",
-  //         //   visible: params.role === "viewer" || params.role.includes("管理者"),
-  //         // },
-  //         // {
-  //         //   icon: "",
-  //         //   title: "闲置地块脏乱差治理",
-  //         //   to: "penaltyPoints",
-  //         //   roles: "闲置地块脏乱差治理",
-  //         //   visible: params.role === "viewer" || params.role.includes("管理者"),
-  //         // },
-  //         // {
-  //         //   icon: "",
-  //         //   title: "油烟负面清单",
-  //         //   to: "penaltyPoints",
-  //         //   roles: "油烟负面清单",
-  //         //   visible: params.role === "viewer" || params.role.includes("管理者"),
-  //         // },
-  //         {
-  //           icon: "",
-  //           title: "固体废弃物处置及垃圾分类",
-  //           to: "penaltyPoints",
-  //           roles: "固体废弃物处置及垃圾分类",
-  //           visible: params.role === "viewer" || params.role.includes("管理者"),
-  //         },
-  //         {
-  //           icon: "",
-  //           title: "数字化常态监管",
-  //           to: "penaltyPoints",
-  //           roles: "数字化常态监管",
-  //           visible: params.role === "viewer" || params.role.includes("管理者"),
-  //         },
-  //         {
-  //           icon: "",
-  //           title: "网络理政",
-  //           to: "penaltyPoints",
-  //           roles: "网络理政",
-  //           visible: params.role === "viewer" || params.role.includes("管理者"),
-  //         },
-  //         {
-  //           icon: "",
-  //           title: "油烟治理",
-  //           to: "penaltyPoints",
-  //           roles: "油烟治理",
-  //           visible: params.role === "viewer" || params.role.includes("管理者"),
-  //         },
-  //         // {
-  //         //   icon: "",
-  //         //   title: "第三方测评",
-  //         //   to: "penaltyPoints",
-  //         //   roles: "第三方测评",
-  //         //   visible: params.role === "viewer" || params.role.includes("管理者"),
-  //         // },
-  //         // {
-  //         //   icon: "",
-  //         //   title: "领导小组综合评价",
-  //         //   to: "penaltyPoints",
-  //         //   roles: "领导小组综合评价",
-  //         //   visible: params.role === "viewer" || params.role.includes("管理者"),
-  //         // },
-  //       ],
-  //     },
-  //   ],
-  // },
-  // { icon: "03,17", title: "体征运行情况导入", to: "subdivisionEntry", submenu: [] },
+  
 ];
 
 

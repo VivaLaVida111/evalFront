@@ -53,6 +53,16 @@ const routes = [
         path: "subdivisionEntry", // 子组件的path不以/开头
         component: () => import("@/views/content/components/SubdivisionEntry.vue"),
       },
+      {
+        name: "caseHandling",
+        path: "caseHandling", // 子组件的path不以/开头
+        component: () => import("@/views/content/components/CaseHandling.vue"),
+      },
+      {
+        name: "inspectionRegistry",
+        path: "inspectionRegistry", // 子组件的path不以/开头
+        component: () => import("@/views/content/components/InspectionRegistry.vue"),
+      },
     ],
   },
 ];
