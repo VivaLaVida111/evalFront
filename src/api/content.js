@@ -191,3 +191,52 @@ export function deleteInspectionRecord(id) {
         method: 'delete'
     })
 }
+
+// 获取问题来源统计数据
+export function getSourceStats(startTime, endTime) {
+    return request({
+        url: '/inspection-record/stats/resource',
+        method: 'get',
+        params: {
+            startTime,
+            endTime
+        }
+    })
+}
+
+// 获取问题类型统计数据
+export function getAttributeStats(startTime, endTime) {
+    return request({
+        url: '/inspection-record/stats/attribute',
+        method: 'get',
+        params: {
+            startTime,
+            endTime
+        }
+    })
+}
+
+// 获取按街道巡查状态统计数据
+export function getPatrolByStreetStats(startTime, endTime) {
+    return request({
+        url: '/inspection-record/stats/patrol-by-street',
+        method: 'get',
+        params: {
+            startTime,
+            endTime
+        }
+    })
+}
+
+// 获取按街道整改完成统计数据
+export function getCheckByStreetStats(startTime, endTime) {
+    return request({
+        url: '/inspection-record/stats/check-by-street',
+        method: 'get',
+        params: {
+            startTime,
+            endTime
+        }
+    })
+}
+

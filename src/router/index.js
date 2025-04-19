@@ -63,6 +63,11 @@ const routes = [
         path: "inspectionRegistry", // 子组件的path不以/开头
         component: () => import("@/views/content/components/InspectionRegistry.vue"),
       },
+      {
+        name: "dataAnalysis",
+        path: "dataAnalysis", // 子组件的path不以/开头
+        component: () => import("@/views/content/components/DataAnalysis.vue"),
+      },
     ],
   },
 ];

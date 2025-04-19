@@ -460,7 +460,8 @@ const menuList_submenu = [
 const menuList_submenu_dust = [
   ...menuList_submenu,  // 展开现有的所有子菜单项
   { icon: "03,17", title: "案件办理", to: "caseHandling", submenu: [] },
-  { icon: "03,17", title: "巡查登记", to: "inspectionRegistry", submenu: [] }
+  { icon: "03,17", title: "巡查登记", to: "inspectionRegistry", submenu: [] },
+  { icon: "03,17", title: "智能分析", to: "dataAnalysis", submenu: [] }
 ]
 
 // 这个应该从后台请求获得
