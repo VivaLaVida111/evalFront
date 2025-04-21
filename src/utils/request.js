@@ -8,7 +8,7 @@ const service = axios.create({
 
 service.interceptors.request.use(
   (config) => {
-    console.log(config.url);
+    // console.log(config.url);
     // 检查URL路径和params.token
     if (config.url !== "auth/login" && params.token) {
       // 修改请求头

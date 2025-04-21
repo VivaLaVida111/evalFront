@@ -241,7 +241,7 @@ const transport_today =
   "-" +
   new Date().getDate();
 var transport_start = transport_today;
-console.log("transport_start" + transport_start);
+// console.log("transport_start" + transport_start);
 
 const data_total = reactive([]);
 
@@ -276,7 +276,7 @@ const exportExcelOfPenaltyPoints = () => {
   if (queryString !== "") {
     URL += "?" + queryString;
   }
-  console.log("exportExcelOfPenaltyPoints URL: ", URL);
+  // console.log("exportExcelOfPenaltyPoints URL: ", URL);
 
   axios({
     url: URL,
@@ -287,12 +287,12 @@ const exportExcelOfPenaltyPoints = () => {
     },
   }).then(function (res) {
     if (res.status === 200) {
-      console.log("成功了！");
-      console.log("res body: ", res.data);
+      // console.log("成功了！");
+      // console.log("res body: ", res.data);
       // 生成blob对象 定义下载格式
       let blob = new Blob([res.data], { type: res.headers['content-type'] });
       // 获取文件名
-      console.log("res.headers: ", res.headers);
+      // console.log("res.headers: ", res.headers);
       let contentDisposition = res.headers['content-disposition'];
       let filename = decodeURIComponent(contentDisposition.split("filename=")[1]);
       // 创建 a标签 执行下载
@@ -317,7 +317,7 @@ const getPenaltyPoints = (startTime, endTime, pageNum) => {
   if (queryString !== "") {
     URL += "?" + queryString;
   }
-  console.log("getPenaltyPoints URL: ", URL);
+  // console.log("getPenaltyPoints URL: ", URL);
   axios({
     url: URL,
     method: "get",
@@ -327,7 +327,7 @@ const getPenaltyPoints = (startTime, endTime, pageNum) => {
     },
   }).then(function (resp) {
     var result = resp.data.data;
-    console.log("getPenaltyPoints: ", result);
+    // console.log("getPenaltyPoints: ", result);
     detailsList.splice(0, detailsList.length);
     var data = result.records;
     for (var key in data) {

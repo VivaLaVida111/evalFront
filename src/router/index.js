@@ -53,6 +53,11 @@ const routes = [
         path: "subdivisionEntry", // 子组件的path不以/开头
         component: () => import("@/views/content/components/SubdivisionEntry.vue"),
       },
+      {
+        name: "dustControlEffect",
+        path: "dustControlEffect", 
+        component: () => import("@/views/content/components/dustControlEffect.vue"),
+      },
     ],
   },
 ];

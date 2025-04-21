@@ -1971,9 +1971,9 @@ const fontSizeSwitch = (res) => {
 /**
  * 横向柱形图1
  */
- const selectedMonth = ref(moment().format("YYYY-MM")); // Default to current month
+const selectedMonth = ref(moment().format("YYYY-MM")); // Default to current month
 var start = moment().startOf("month").format("YYYY-MM-DD");
-var end = moment().add(1, 'days').format("YYYY-MM-DD");;
+var end = moment().add(1, 'days').format("YYYY-MM-DD");
 const scoresList = reactive([]);
 const streetsList = reactive([]);
 
@@ -1992,7 +1992,7 @@ const handleMonthChange = (value) => {
   start = monthStart;
   end = monthEnd;
   
-  console.log(`Date range updated: ${start} to ${end}`);
+  // console.log(`Date range updated: ${start} to ${end}`);
   
   // Re-fetch data and update charts with the new date range
   create_horizontal_bar();
@@ -2001,7 +2001,7 @@ const handleMonthChange = (value) => {
 
 const getScores = (startTime, endTime) => {
   var URL = "/api/details/score/" + startTime + "/" + endTime;
-  console.log("Fetching scores for period:", startTime, "to", endTime);
+  // console.log("Fetching scores for period:", startTime, "to", endTime);
   
   return axios({
     url: URL,
@@ -2012,7 +2012,7 @@ const getScores = (startTime, endTime) => {
     },
   }).then(function (resp) {
     var data = resp.data.data;
-    console.log("Retrieved scores data:", data);
+    // console.log("Retrieved scores data:", data);
     
     scoresList.splice(0, scoresList.length);
     streetsList.splice(0, streetsList.length);
@@ -2070,6 +2070,7 @@ const horizontalOpt = {
 };
 
 let horizontalBar = null;
+//创建左侧柱状图
 const create_horizontal_bar = async () => {
   try {
     let chartDom = document.getElementById("horizontal_bar");
@@ -2105,7 +2106,7 @@ const bigRulsList = reactive([]);
 const demeritList = reactive([]);
 const getStatistics = (startTime, endTime) => {
   var URL = "/api/details/bigRulesStatistics/" + startTime + "/" + endTime;
-  console.log("Fetching statistics for period:", startTime, "to", endTime);
+  // console.log("Fetching statistics for period:", startTime, "to", endTime);
   
   return axios({
     url: URL,
@@ -2116,7 +2117,7 @@ const getStatistics = (startTime, endTime) => {
     },
   }).then(function (resp) {
     var data = resp.data.data;
-    console.log("Retrieved statistics data:", data);
+    // console.log("Retrieved bigRulestatistics data:", data);
     
     bigRulesStatistics.splice(0, bigRulesStatistics.length);
     bigRulsList.splice(0, bigRulsList.length);
@@ -2126,13 +2127,14 @@ const getStatistics = (startTime, endTime) => {
       bigRulesStatistics.push(data[key]);
       bigRulsList.push(data[key].item);
       demeritList.push(Math.abs(data[key].score));
+      console.log("bigRulesStatistics:", bigRulesStatistics);
     }
   }).catch(error => {
     console.error("Failed to fetch statistics data:", error);
     // Optionally show user-friendly error message
   });
 };
-
+//画右侧表
 const horizontalOpt1 = {
   xAxis: {
     max: "dataMax",
@@ -2173,7 +2175,7 @@ const horizontalOpt1 = {
 };
 
 let pieChart = null;
-
+//饼状图
 const createPieChart = () => {
   const pieDom = document.getElementById("pie_chart");
   if (!pieDom) return;
@@ -2214,7 +2216,7 @@ const createPieChart = () => {
   pieChart.setOption(pieOption);
   window.addEventListener("resize", pieChart.resize);
 };
-
+//柱状图
 let horizontalBar1 = null;
 const create_horizontal_bar1 = async () => {
   try {
@@ -2257,9 +2259,9 @@ const site_name_yAxis = ref([]);
 var xAxis = 0;
 
 xAxis = getDateList(6, 24 * 60 * 60 * 1000);
-console.log("xAxis" + xAxis);
+// console.log("xAxis" + xAxis);
 var site_name_date = xAxis.toString().split(",");
-console.log("xAxis_arry" + site_name_date[0]);
+// console.log("xAxis_arry" + site_name_date[0]);
 
 function getDateList(count, long) {
   var time = new Date().setMinutes(0);
