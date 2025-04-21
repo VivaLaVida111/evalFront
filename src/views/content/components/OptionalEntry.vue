@@ -103,6 +103,10 @@
       type: Boolean,
       default: true,
     },
+    initialRole: {
+      type: String,
+      default: ""
+    }
   });
   
   const localFormData = reactive({ ...props.formData });
@@ -333,4 +337,31 @@
         });
       });
   }
+  
+  watch(
+    () => detailRules.value,
+    (newVal) => {
+      if (newVal.length > 0 && props.initialRole) {
+        const matchedRule = filteredDetailRules.value.find(
+          rule => rule.bigRules.item === props.initialRole
+        );
+        if (matchedRule) {
+          localFormData.bigRulesId = matchedRule.bigRules.id;
+        }
+      }
+    }
+  );
+  
+  watch(
+    () => props.initialRole,
+    (newVal) => {
+      if (newVal && detailRules.value.length > 0) {
+        const matchedRule = filteredDetailRules.value.find(
+          rule => rule.bigRules.item === newVal
+        );
+        // 如果匹配到，就更新 localFormData.bigRulesId；否则清空
+        localFormData.bigRulesId = matchedRule ? matchedRule.bigRules.id : null;
+      }
+    }
+  );
   </script>

@@ -88,6 +88,10 @@ const props = defineProps({
     type: Boolean,
     default: true,
   },
+  initialRole: {
+    type: String,
+    default: ""
+  }
 });
 
 const localSubmitVisible = ref(props.submitVisible);
@@ -290,6 +294,32 @@ function clearChart() {
     chartInstance.clear();
   }
 }
+watch(
+  () => detailRules.value,
+  (newVal) => {
+    if (newVal.length > 0 && props.initialRole) {
+      const matchedRule = filteredDetailRules.value.find(
+        rule => rule.bigRules.item === props.initialRole
+      );
+      if (matchedRule) {
+        selectedBigRule.value = matchedRule.bigRules.id;
+      }
+    }
+  }
+);
+
+watch(
+  () => props.initialRole,
+  (newVal) => {
+    if (newVal && detailRules.value.length > 0) {
+      const matchedRule = filteredDetailRules.value.find(
+        rule => rule.bigRules.item === newVal
+      );
+      // 如果匹配到，就更新 selectedBigRule；否则清空
+      selectedBigRule.value = matchedRule ? matchedRule.bigRules.id : null;
+    }
+  }
+);
 </script>
 
 <style scoped>
