@@ -2140,7 +2140,7 @@ const getStatistics = (startTime, endTime) => {
   })
     .then(function (resp) {
       var data = resp.data.data;
-      console.log("Retrieved statistics data:", data);
+      // console.log("Retrieved statistics data:", data);
 
       bigRulesStatistics.splice(0, bigRulesStatistics.length);
       bigRulsList.splice(0, bigRulsList.length);
