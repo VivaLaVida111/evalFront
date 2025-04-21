@@ -64,7 +64,7 @@
           <template v-for="(item, idx) in menuList">
             <!-- 判断是否有二级菜单 -->
             <!--有二级菜单，则以子菜单的形式展示;没有二级菜单，则以菜单项显示-->
-            <template v-if="item.title==params.role||params.role=='管理者'||params.role=='viewer' && item.submenu.length > 0">
+            <template v-if="(item.title==params.role||params.role=='管理者'||params.role=='viewer') && item.submenu.length > 0">
               <el-sub-menu :index="idx + ''" :key="idx" collapse="true">
                 <!-- 定义图标与文字 -->
                 <template #title>
@@ -92,7 +92,7 @@
                               :index="idx + '-' + subidx + '-' + subsubidx + '-' + subsubsubidx"
                               :key="idx + '-' + subidx + '-' + subsubidx + '-' + subsubsubidx"
                               @click="
-                                displayContentWithQuery(subsubsubitem.to, subsubsubitem.street, subsubsubitem.roles)
+                                displayContentWithQuery(subsubsubitem.to, subsubsubitem.street, item.title)
                               ">
                               <span style="font-size: 0.15rem">{{subsubsubitem.title}}</span>
                             </el-menu-item>
@@ -106,7 +106,7 @@
                     <el-menu-item v-if="params.role !== 'viewer'"
                       :index="idx + '-' + subidx"
                       :key="idx + '-' + subidx"
-                      @click="displayContent(subitem.to)"
+                      @click="displayContentWithQuery(subitem.to, '', item.title)"
                     >
                       <span style="font-size: 0.20rem">{{ subitem.title }}</span>
                     </el-menu-item>
@@ -170,7 +170,8 @@ function toSystem(item) {
 onMounted(() => {
   // 只有当我们处于基本内容路径且没有子路由时才重定向
   if (route.path === "/content") {
-    router.push({ path: "/content/penaltyPoints", query: { roles: params.role } });
+    //router.push({ path: "/content/penaltyPoints", query: { roles: params.role } });
+    router.push({ path: "/content/ruleConfig" });
   }
   // 否则，保留现有路由和参数
 });
@@ -484,16 +485,26 @@ function displayContent(name) {
   router.push({ name }); 
 }
 function displayContentWithQuery(name, street, roles) {
-  if (roles != undefined && roles != "") {
-    // 有roles参数，说明是按管理门类查询
-    router.push({ path: name, query: { roles: roles } });
-  } else if (street != undefined && street != "") {
-    // 有street参数，说明是按街道查询；同时传递roles参数对大规则进行过滤：对应大规则的管理员只能看到该规则的事件，viewer和总的管理者可以看到所有规则的事件
-    router.push({ path: name, query: { street: street, roles: params.role } });
-  } else {
-    // 无参数，传递roles参数对大规则进行过滤
-    router.push({ path: name, query: { roles: params.role } });
+  // if (roles != undefined && roles != "") {
+  //   // 有roles参数，说明是按管理门类查询
+  //   router.push({ path: name, query: { roles: roles } });
+  // } else if (street != undefined && street != "") {
+  //   // 有street参数，说明是按街道查询；同时传递roles参数对大规则进行过滤：对应大规则的管理员只能看到该规则的事件，viewer和总的管理者可以看到所有规则的事件
+  //   router.push({ path: name, query: { street: street, roles: params.role } });
+  // } else {
+  //   // 无参数，传递roles参数对大规则进行过滤
+  //   router.push({ path: name, query: { roles: params.role } });
+  // }
+
+  const query = {}
+  // 添加roles参数，如果为空则使用params.role
+  query.roles = roles || params.role;
+  // 只有当street参数存在且不为空时才添加到query中
+  if (street != undefined && street != "") {
+    query.street = street;
   }
+  
+  router.push({ path: name, query });
 }
 
 function getIcon(idxStr) {

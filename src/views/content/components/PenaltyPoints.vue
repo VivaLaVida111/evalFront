@@ -2,7 +2,7 @@
   <el-container>
     <el-header style="font-size: 25px; padding: 5px">
       <h5 class="card-title" style="font-size: 30px; padding: 5px">
-        体征事件查询
+        体征事件查询 {{ roles ? `- ${roles}` : "" }}
       </h5>
     </el-header>
     <el-main>
@@ -221,8 +221,23 @@ const route = useRoute();
 const street = computed(() => {
   return isEmptyObject(route.query) ? "" : route.query.street;
 });
+// const roles = computed(() => {
+//   return isEmptyObject(route.query) ? "" : route.query.roles;
+// });
 const roles = computed(() => {
-  return isEmptyObject(route.query) ? "" : route.query.roles;
+  const roleValue = isEmptyObject(route.query) ? "" : route.query.roles;
+  
+  // 如果filteredDetailRules已加载并且有值
+  if (filteredDetailRules.value && filteredDetailRules.value.length > 0) {
+    // 检查roleValue是否与任何规则的bigRules.item匹配
+    const matchingRule = filteredDetailRules.value.find(rule => 
+      rule.bigRules && rule.bigRules.item === roleValue
+    );
+    
+    return matchingRule ? roleValue : '';
+  }
+  
+  return roleValue;
 });
 
 let totalRecords = ref(1000);
