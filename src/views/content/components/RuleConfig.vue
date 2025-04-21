@@ -254,7 +254,7 @@ const newSmallRule = reactive({
 });
 
 const toggle = (rule) => {
-  console.log(rule);
+  // console.log(rule);
   selectedRule.value = rule;
   dialogVisible.value = true;
 };
