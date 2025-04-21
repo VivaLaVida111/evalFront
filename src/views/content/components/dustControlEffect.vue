@@ -31,9 +31,9 @@ var end = moment().add(1, 'days').format("YYYY-MM-DD");
 const scoresList = reactive([]);
 const streetsList = reactive([]);
 const get_cxfx_Scores = async(startTime, endTime) => {
-    await getDetailRules_fun();
-    const role_id = detailRules.value[rule_map.indexOf(params.role)].bigRules.id;
-    const data = await getStreetStatistics(startTime, endTime, role_id);
+    // await getDetailRules_fun();
+    // const role_id = detailRules.value[rule_map.indexOf(params.role)].bigRules.id;
+    const data = await getStreetStatistics(startTime, endTime, 8);
     // console.log("Retrieved scores data:", data);
     
     scoresList.splice(0, scoresList.length);
@@ -47,9 +47,9 @@ const get_cxfx_Scores = async(startTime, endTime) => {
 //获取薄弱环节分析数据
 const smallRulesStatistics = reactive([]);
 const get_brhj_Scores = async(startTime, endTime) => {
-  await getDetailRules_fun();
-  const role_id = detailRules.value[rule_map.indexOf(params.role)].bigRules.id;
-  const data = await getSmallRulesStatistics(startTime, endTime, role_id); 
+  // await getDetailRules_fun();
+  // const role_id = detailRules.value[rule_map.indexOf(params.role)].bigRules.id;
+  const data = await getSmallRulesStatistics(startTime, endTime, 8); 
   smallRulesStatistics.splice(0, smallRulesStatistics.length);
   for (var key in data) {
     smallRulesStatistics.push(data[key]);
