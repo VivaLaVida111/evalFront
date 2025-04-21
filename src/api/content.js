@@ -24,6 +24,14 @@ export function getStreetStatistics(start, end, bigRuleId) {
     })
 }
 
+export function getSmallRulesStatistics(start, end, bigRuleId) {
+    return request({
+        url: '/details/smallRuleStatistics/' + start + '/' + end + '/' + bigRuleId,
+        method: 'get' 
+    })
+}
+
+
 export function getDetails(start, end, street) {
     return request({
         url: '/details/period/' + start + '/' + end + '/' + street,
@@ -31,6 +39,7 @@ export function getDetails(start, end, street) {
     })
 }
 
+//获取全部大规则
 export function getDetailRules() {
     return request({
         url: '/big-rules/getDetailRules',

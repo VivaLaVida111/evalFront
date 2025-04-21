@@ -17,6 +17,7 @@
     "axios": "^0.27.2",
     "babel-polyfill": "^6.26.0",
     "bootstrap": "^5.2.3",
+    "chart.js": "^4.4.9",
     "core-js": "^3.8.3",
     "date-picker-week-range": "^1.3.0",
     "date-week-range": "^2.0.0",

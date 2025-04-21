@@ -68,6 +68,11 @@ const routes = [
         path: "dataAnalysis", // 子组件的path不以/开头
         component: () => import("@/views/content/components/DataAnalysis.vue"),
       },
+      {
+        name: "dustControlEffect",
+        path: "dustControlEffect", 
+        component: () => import("@/views/content/components/dustControlEffect.vue"),
+      },
     ],
   },
 ];

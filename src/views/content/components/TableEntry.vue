@@ -211,7 +211,7 @@ function submitForm() {
     }))
   );
 
-  console.log("Form submitted:", records);
+  // console.log("Form submitted:", records);
 
   Promise.all(records.map((record) => addSubdivision(record)))
     .then((results) => {
