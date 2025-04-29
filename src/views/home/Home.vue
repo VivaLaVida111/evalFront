@@ -182,7 +182,7 @@
 
           <div id="horizontal_bar1"></div>
 
-          <div id="pie_chart" style="height: 150px; margin-top: 10px"></div>
+          <div id="pie_chart" style="height: 250px; margin-top: 10px"></div>
 
           <div class="panel_footer"></div>
         </div>
@@ -2169,7 +2169,7 @@ const horizontalOpt1 = {
     inverse: true,
     animationDuration: 0,
     animationDurationUpdate: 0,
-    max: 13,
+    max: 9,
   },
   series: [
     {
