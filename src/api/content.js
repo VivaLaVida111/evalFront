@@ -31,14 +31,12 @@ export function getSmallRulesStatistics(start, end, bigRuleId) {
     })
 }
 
-
 export function getDetails(start, end, street) {
     return request({
         url: '/details/period/' + start + '/' + end + '/' + street,
         method: 'get'
     })
 }
-
 //获取全部大规则
 export function getDetailRules() {
     return request({
@@ -53,7 +51,7 @@ export function getSelfRoles() {
         method: 'get'
     })
 }
-
+//add detail
 export function addSubdivision(data) {
     return request({
         url: '/details/add',

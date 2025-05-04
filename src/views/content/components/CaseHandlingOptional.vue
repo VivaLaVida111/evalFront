@@ -28,10 +28,10 @@
           <button 
             class="btn-decrement" 
             @click="decrement"
-            :disabled="currentValue <= min"
+            :disabled="detailData.input <= min"
           >-</button>
           <input
-            v-model="caseRecord.score"
+            v-model="detailData.input"
             type="number"
             :min="min" :max="max"
             :step="step"
@@ -41,7 +41,7 @@
           <button 
             class="btn-increment" 
             @click="increment"
-            :disabled="currentValue >= max"
+            :disabled="detailData.input >= max"
           >+</button>
         </el-form-item>
         <el-form-item label="备注">
@@ -72,7 +72,7 @@
           ></el-date-picker>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="submitForm">提交</el-button>
+          <el-button type="primary" @click="submit">提交</el-button>
           <el-button @click="resetForm">重置</el-button>
         </el-form-item>
       </el-form>
@@ -83,7 +83,7 @@
 <script setup>
 import { ref, reactive, toRefs, watch} from 'vue';
 import { ElMessage } from 'element-plus';
-import { addCaseRecord, formatLocalDateTime } from '@/api/content.js';
+import { addCaseRecord, formatLocalDateTime, addSubdivision, getDetailRules} from '@/api/content.js';
 
 const form = ref(null);
 
@@ -103,17 +103,21 @@ const streets = ref([
   { label: "凤凰山街道", value: "凤凰山街道" },
 ]);
 
-//表格数据
+//提交
+const submit = () => {
+  submitForm();
+  addDetail();
+  resetForm();
+};
+//提交案件数据
 const caseRecord = reactive({
   street: '',
   caseNumber: '',
   reason: '',
-  score: 0,
   remark: '',
   filingTime: formatLocalDateTime(),
   closeTime: ''
 });
-
 const submitForm = async () => {
   if (!caseRecord.street) {
     ElMessage.error('请选择所属街道');
@@ -137,13 +141,42 @@ const submitForm = async () => {
       message: '案件信息提交成功',
       type: 'success',
     });
-    resetForm();
   } catch (error) {
     console.error('提交案件信息失败：', error);
     ElMessage.error('提交失败，请重试');
   }
 };
-
+////提交detail数据
+const detailData = reactive({
+    street: '',
+    resultId: '',
+    bigRulesId: 8,
+    smallRulesId: '',
+    remark: '',
+    input: 0,
+    subtotal: '',
+});
+const addDetail = async () => {
+  // const data = await getDetailRules();
+  // const role_id = data.value[rule_map.indexOf(params.role)].bigRules.id;
+  // detailData.bigRulesId = role_id;
+  detailData.street = caseRecord.street;
+  detailData.smallRulesId = caseRecord.caseNumber;
+  detailData.remark = caseRecord.remark;
+  detailData.subtotal = detailData.input * 0.05;
+  console.log('smallRulesId:', detailData.smallRulesId);
+  try {
+    await addSubdivision(detailData)
+    ElMessage({
+      message: '信息提交成功',
+      type: 'success',
+    });
+    resetForm();
+  } catch (error) {
+    console.error('提交信息失败：', error);
+    ElMessage.error('提交失败，请重试');
+  }
+};
 //重置表单
 const resetForm = () => {
   Object.assign(caseRecord, {
@@ -180,33 +213,33 @@ const emit = defineEmits(['update:modelValue', 'change'])
 const { modelValue, min, max } = toRefs(props)
 // 监听外部值变化
 watch(modelValue, (newVal) => {
-  caseRecord.score = newVal
+  detailData.input = newVal
 })
 // 监听内部值变化
-watch(caseRecord.score, (newVal) => {
+watch(detailData.input, (newVal) => {
   emit('update:modelValue', newVal)
   emit('change', newVal)
 })
 //增加数
 const increment = () => {
-  if (caseRecord.score < max.value) {
-    caseRecord.score += props.step
+  if (detailData.input < max.value) {
+    detailData.input += props.step
   }
 }
 //减少数
 const decrement = () => {
-  if (caseRecord.score > min.value) {
-    caseRecord.score -= props.step
+  if (detailData.input > min.value) {
+    detailData.input -= props.step
   }
 }
 //输入校验
 const validateInput = () => {
-  if (caseRecord.score > max.value) {
-    caseRecord.score = max.value
-  } else if (caseRecord.score < min.value) {
-    caseRecord.score = min.value
-  } else if (isNaN(caseRecord.score)) {
-    caseRecord.score = 0
+  if (detailData.input > max.value) {
+    detailData.input = max.value
+  } else if (detailData.input < min.value) {
+    detailData.input = min.value
+  } else if (isNaN(detailData.input)) {
+    detailData.input = 0
   }
 }
 </script>
