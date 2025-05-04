@@ -24,6 +24,26 @@
             placeholder="请输入处罚事由"
           ></el-input>
         </el-form-item>
+        <el-form-item label="加减分">
+          <button 
+            class="btn-decrement" 
+            @click="decrement"
+            :disabled="currentValue <= min"
+          >-</button>
+          <input
+            v-model="caseRecord.score"
+            type="number"
+            :min="min" :max="max"
+            :step="step"
+            @change="validateInput"
+            class="input-field"
+          />
+          <button 
+            class="btn-increment" 
+            @click="increment"
+            :disabled="currentValue >= max"
+          >+</button>
+        </el-form-item>
         <el-form-item label="备注">
           <el-input
             v-model="caseRecord.remark"
@@ -61,7 +81,7 @@
 </template>
 
 <script setup>
-import { ref, reactive } from 'vue';
+import { ref, reactive, toRefs, watch} from 'vue';
 import { ElMessage } from 'element-plus';
 import { addCaseRecord, formatLocalDateTime } from '@/api/content.js';
 
@@ -83,17 +103,18 @@ const streets = ref([
   { label: "凤凰山街道", value: "凤凰山街道" },
 ]);
 
+//表格数据
 const caseRecord = reactive({
   street: '',
   caseNumber: '',
   reason: '',
+  score: 0,
   remark: '',
   filingTime: formatLocalDateTime(),
   closeTime: ''
 });
 
 const submitForm = async () => {
-  // Validate form data
   if (!caseRecord.street) {
     ElMessage.error('请选择所属街道');
     return;
@@ -110,7 +131,6 @@ const submitForm = async () => {
     ElMessage.error('请选择立案时间');
     return;
   }
-
   try {
     await addCaseRecord(caseRecord);
     ElMessage({
@@ -124,16 +144,71 @@ const submitForm = async () => {
   }
 };
 
+//重置表单
 const resetForm = () => {
   Object.assign(caseRecord, {
     street: '',
     caseNumber: '',
     reason: '',
+    score: 0,
     remark: '',
     filingTime: formatLocalDateTime(),
     closeTime: ''
   });
 };
+
+//按钮参数
+const props = defineProps({
+  modelValue: {
+    type: Number,
+    default: 0
+  },
+  min: {
+    type: Number,
+    default: -100
+  },
+  max: {
+    type: Number,
+    default: 100
+  },
+  step: {
+    type: Number,
+    default: 1
+  }
+})
+const emit = defineEmits(['update:modelValue', 'change'])
+const { modelValue, min, max } = toRefs(props)
+// 监听外部值变化
+watch(modelValue, (newVal) => {
+  caseRecord.score = newVal
+})
+// 监听内部值变化
+watch(caseRecord.score, (newVal) => {
+  emit('update:modelValue', newVal)
+  emit('change', newVal)
+})
+//增加数
+const increment = () => {
+  if (caseRecord.score < max.value) {
+    caseRecord.score += props.step
+  }
+}
+//减少数
+const decrement = () => {
+  if (caseRecord.score > min.value) {
+    caseRecord.score -= props.step
+  }
+}
+//输入校验
+const validateInput = () => {
+  if (caseRecord.score > max.value) {
+    caseRecord.score = max.value
+  } else if (caseRecord.score < min.value) {
+    caseRecord.score = min.value
+  } else if (isNaN(caseRecord.score)) {
+    caseRecord.score = 0
+  }
+}
 </script>
 
 <style scoped>
@@ -141,4 +216,51 @@ const resetForm = () => {
   max-width: 600px;
   margin: 0 auto;
 } */
+
+
+.score-label {
+  margin-bottom: 8px;
+  font-weight: bold;
+}
+
+.input-field {
+  width: 80px;
+  height: 36px;
+  margin: 0 8px;
+  padding: 0 10px;
+  text-align: center;
+  border: 1px solid #dcdfe6;
+  border-radius: 4px;
+  transition: border-color 0.2s;
+}
+
+.input-field:focus {
+  outline: none;
+  border-color: #409eff;
+}
+
+.btn-increment, .btn-decrement {
+  width: 36px;
+  height: 36px;
+  font-size: 16px;
+  color: #606266;
+  background-color: #f5f7fa;
+  border: 1px solid #dcdfe6;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-increment:hover, .btn-decrement:hover {
+  color: #409eff;
+  border-color: #c6e2ff;
+  background-color: #ecf5ff;
+}
+
+.btn-increment:disabled, .btn-decrement:disabled {
+  color: #c0c4cc;
+  cursor: not-allowed;
+  background-color: #f5f7fa;
+  border-color: #e4e7ed;
+}
 </style>

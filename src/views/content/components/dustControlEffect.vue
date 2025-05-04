@@ -109,7 +109,45 @@ const horizontalOpt = {
   animationEasing: "linear",
   animationEasingUpdate: "linear",
 };
-
+//定义饼状图配置
+const pieOpt = {
+  title: {
+    text: "金牛区扬尘整治薄弱环节分析",
+    left: "center",
+    top: "0%",
+    textStyle: {
+      fontSize: 20,
+      fontWeight: "bold",
+      color: "#333",
+    },
+  },
+  tooltip: {
+    trigger: "item",
+  },
+  legend: {
+    orient: "vertical",
+    left: "left",
+    textStyle: {
+      color: "#333",
+    },
+  },
+  series: [
+    {
+      type: "pie",
+      radius: "100%",
+      top: "10%",
+      center: ["50%", "50%"], 
+      data: [],
+      emphasis: {
+        itemStyle: {
+          shadowBlur: 10,
+          shadowOffsetX: 0,
+          shadowColor: "rgba(0, 0, 0, 0.5)",
+        },
+      },
+    },
+  ],
+};
 //创建表
 const horizontal_bar1 = ref(null);
 let horizontalBar = null;
@@ -146,51 +184,10 @@ const create_PieChart = async() => {
   try{
     pieChart = echarts.init(pie_chart.value);
     await get_brhj_Scores(start, end);
-    //定义饼状图配置
-    const pieOpt = {
-      title: {
-        text: "金牛区扬尘整治薄弱环节分析",
-        left: "center",
-        top: "0%",
-        textStyle: {
-          fontSize: 20,
-          fontWeight: "bold",
-          color: "#333",
-        },
-      },
-      tooltip: {
-        trigger: "item",
-      },
-      legend: {
-        orient: "vertical",
-        left: "left",
-        textStyle: {
-          color: "#333",
-        },
-      },
-      series: [
-        {
-          type: "pie",
-          radius: "100%",
-          top: "10%",
-          center: ["50%", "50%"], 
-          data: smallRulesStatistics.map((item) => ({
-            name: item.item,
-            value: Math.abs(item.score),
-          })),
-          // data: smallRulesStatistics,
-          // data: transformedData.value,
-          emphasis: {
-            itemStyle: {
-              shadowBlur: 10,
-              shadowOffsetX: 0,
-              shadowColor: "rgba(0, 0, 0, 0.5)",
-            },
-          },
-        },
-      ],
-    };
-    // console.log("transformedData:",transformedData);
+    pieOpt.series[0].data = smallRulesStatistics.map((item) => ({
+      name: item.item,
+      value: Math.abs(item.score),
+    }));
     pieChart.setOption(pieOpt);
     window.addEventListener("resize", pieChart.resize);
   }catch (error) {
