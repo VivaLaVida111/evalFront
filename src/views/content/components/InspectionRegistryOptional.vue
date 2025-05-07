@@ -47,6 +47,26 @@
             />
           </el-select>
         </el-form-item>
+        <el-form-item label="加减分">
+          <button 
+            class="btn-decrement" 
+            @click="decrement"
+            :disabled="detailData.input <= min"
+          >-</button>
+          <input
+            v-model="detailData.input"
+            type="number"
+            :min="min" :max="max"
+            :step="step"
+            @change="validateInput"
+            class="input-field"
+          />
+          <button 
+            class="btn-increment" 
+            @click="increment"
+            :disabled="detailData.input >= max"
+          >+</button>
+        </el-form-item>
         <el-form-item label="巡查状态">
           <!-- <el-select v-model="inspectionRecord.patrolStatus" placeholder="选择巡查状态">
             <el-option
@@ -85,7 +105,7 @@
           </el-select>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="submitForm">提交</el-button>
+          <el-button type="primary" @click="submit">提交</el-button>
           <el-button @click="resetForm">重置</el-button>
         </el-form-item>
       </el-form>
@@ -94,9 +114,9 @@
 </template>
 
 <script setup>
-import { ref, reactive } from 'vue';
+import { ref, reactive, toRefs, watch } from 'vue';
 import { ElMessage } from 'element-plus';
-import { addInspectionRecord, formatLocalDateTime } from '@/api/content.js';
+import { addInspectionRecord, formatLocalDateTime, addSubdivision} from '@/api/content.js';
 
 const form = ref(null);
 
@@ -144,6 +164,14 @@ const checkStatuses = ref([
   { label: "无问题", value: "无问题" },
 ]);
 
+
+//提交
+const submit = () => {
+  submitForm();
+  addDetail();
+  resetForm();
+};
+//提交表单数据
 const inspectionRecord = reactive({
   resource: '',
   inspectionNumber: '',
@@ -158,9 +186,7 @@ const inspectionRecord = reactive({
   checkStatus: '',
   reformPic: ''
 });
-
 const submitForm = async () => {
-  // Validate form data
   if (!inspectionRecord.inspectionNumber) {
     ElMessage.error('请输入巡查编号');
     return;
@@ -181,20 +207,42 @@ const submitForm = async () => {
     ElMessage.error('请输入巡查人姓名');
     return;
   }
-
   try {
     await addInspectionRecord(inspectionRecord);
     ElMessage({
       message: '巡查记录提交成功',
       type: 'success',
     });
-    resetForm();
   } catch (error) {
     console.error('提交巡查记录失败：', error);
     ElMessage.error('提交失败，请重试');
   }
 };
-
+//提交detail数据
+const detailData = reactive({
+    street: '',
+    resultId: '',
+    bigRulesId: 8,
+    smallRulesId: 5,
+    remark: '来自巡查登记',
+    input: 0,
+    subtotal: '',
+});
+const addDetail = async () => {
+  detailData.street = inspectionRecord.street;
+  detailData.subtotal = detailData.input * 0.05;
+  try {
+    await addSubdivision(detailData)
+    ElMessage({
+      message: '信息提交成功',
+      type: 'success',
+    });
+  } catch (error) {
+    console.error('提交信息失败：', error);
+    ElMessage.error('提交失败，请重试');
+  }
+};
+//重置表单
 const resetForm = () => {
   Object.assign(inspectionRecord, {
     resource: '',
@@ -211,8 +259,97 @@ const resetForm = () => {
     reformPic: ''
   });
 };
+
+//按钮参数
+const props = defineProps({
+  modelValue: {
+    type: Number,
+    default: 0
+  },
+  min: {
+    type: Number,
+    default: -100
+  },
+  max: {
+    type: Number,
+    default: 100
+  },
+  step: {
+    type: Number,
+    default: 1
+  }
+})
+const emit = defineEmits(['update:modelValue', 'change'])
+const { modelValue, min, max } = toRefs(props)
+// 监听外部值变化
+watch(modelValue, (newVal) => {
+  detailData.input = newVal
+})
+// 监听内部值变化
+watch(detailData.input, (newVal) => {
+  emit('update:modelValue', newVal)
+  emit('change', newVal)
+})
+//增加数
+const increment = () => {
+  if (detailData.input < max.value) {
+    detailData.input += props.step
+  }
+}
+//减少数
+const decrement = () => {
+  if (detailData.input > min.value) {
+    detailData.input -= props.step
+  }
+}
+//输入校验
+const validateInput = () => {
+  if (detailData.input > max.value) {
+    detailData.input = max.value
+  } else if (detailData.input < min.value) {
+    detailData.input = min.value
+  } else if (isNaN(detailData.input)) {
+    detailData.input = 0
+  }
+}
 </script>
 
 <style scoped>
-/* Add any custom styles here */
+/* 加减分输入框样式 */
+.input-field {
+  width: 80px;
+  height: 36px;
+  margin: 0 8px;
+  padding: 0 10px;
+  text-align: center;
+  border: 1px solid #dcdfe6;
+  border-radius: 4px;
+  transition: border-color 0.2s;
+}
+.input-field:focus {
+  outline: none;
+  border-color: #409eff;
+}
+.btn-increment, .btn-decrement {
+  width: 36px;
+  height: 36px;
+  font-size: 16px;
+  color: #606266;
+  background-color: #f5f7fa;
+  border: 1px solid #dcdfe6;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-increment:hover, .btn-decrement:hover {
+  color: #409eff;
+  border-color: #c6e2ff;
+  background-color: #ecf5ff;
+}
+.btn-increment:disabled, .btn-decrement:disabled {
+  color: #c0c4cc;
+  cursor: not-allowed;
+  background-color: #f5f7fa;
+  border-color: #e4e7ed;
+}
 </style>

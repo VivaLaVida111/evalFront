@@ -31,12 +31,12 @@
             :disabled="detailData.input <= min"
           >-</button>
           <input
+            class="input-field"
             v-model="detailData.input"
             type="number"
             :min="min" :max="max"
             :step="step"
             @change="validateInput"
-            class="input-field"
           />
           <button 
             class="btn-increment" 
@@ -83,7 +83,7 @@
 <script setup>
 import { ref, reactive, toRefs, watch} from 'vue';
 import { ElMessage } from 'element-plus';
-import { addCaseRecord, formatLocalDateTime, addSubdivision, getDetailRules} from '@/api/content.js';
+import { addCaseRecord, formatLocalDateTime, addSubdivision} from '@/api/content.js';
 
 const form = ref(null);
 
@@ -146,12 +146,12 @@ const submitForm = async () => {
     ElMessage.error('提交失败，请重试');
   }
 };
-////提交detail数据
+//提交detail数据
 const detailData = reactive({
     street: '',
     resultId: '',
     bigRulesId: 8,
-    smallRulesId: '',
+    smallRulesId: 6,
     remark: '',
     input: 0,
     subtotal: '',
@@ -161,17 +161,14 @@ const addDetail = async () => {
   // const role_id = data.value[rule_map.indexOf(params.role)].bigRules.id;
   // detailData.bigRulesId = role_id;
   detailData.street = caseRecord.street;
-  detailData.smallRulesId = caseRecord.caseNumber;
   detailData.remark = caseRecord.remark;
   detailData.subtotal = detailData.input * 0.05;
-  console.log('smallRulesId:', detailData.smallRulesId);
   try {
     await addSubdivision(detailData)
     ElMessage({
       message: '信息提交成功',
       type: 'success',
     });
-    resetForm();
   } catch (error) {
     console.error('提交信息失败：', error);
     ElMessage.error('提交失败，请重试');
@@ -255,7 +252,7 @@ const validateInput = () => {
   margin-bottom: 8px;
   font-weight: bold;
 }
-
+/* 加减分输入框样式 */
 .input-field {
   width: 80px;
   height: 36px;
@@ -266,12 +263,10 @@ const validateInput = () => {
   border-radius: 4px;
   transition: border-color 0.2s;
 }
-
 .input-field:focus {
   outline: none;
   border-color: #409eff;
 }
-
 .btn-increment, .btn-decrement {
   width: 36px;
   height: 36px;
@@ -283,13 +278,11 @@ const validateInput = () => {
   cursor: pointer;
   transition: all 0.2s;
 }
-
 .btn-increment:hover, .btn-decrement:hover {
   color: #409eff;
   border-color: #c6e2ff;
   background-color: #ecf5ff;
 }
-
 .btn-increment:disabled, .btn-decrement:disabled {
   color: #c0c4cc;
   cursor: not-allowed;
