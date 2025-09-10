@@ -5,7 +5,7 @@
         体征运行情况导入 {{ roles ? `- ${roles}` : '' }}
       </h5>
       <el-button type="primary" @click="showOptionalEntry" style="margin-right: 10px;">选项式录入</el-button>
-      <el-button type="primary" @click="showTableEntry">表格式录入</el-button>
+<!--      <el-button type="primary" @click="showTableEntry">表格式录入</el-button>-->
     </el-header>
     <!-- 传递 roles 参数给子组件 -->
     <div v-if="currentView === 'OptionalEntry'">

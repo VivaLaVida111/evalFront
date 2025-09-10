@@ -66,7 +66,7 @@
         <el-button type="primary" @click="submitForm">提交</el-button>
       </el-form-item>
     </el-form>
-    <div ref="chartContainer" style="width: 100%; height: 400px"></div>
+<!--    <div ref="chartContainer" style="width: 100%; height: 400px"></div>-->
   </el-main>
 </template>
 

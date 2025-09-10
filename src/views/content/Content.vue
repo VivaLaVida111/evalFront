@@ -217,12 +217,12 @@ function logout() {
 const menuList_submenu = [
   { icon: "02,14",title: "体征事件查询",to: "penaltyPoints",
     submenu: [
-      {
-        icon: "",
-        title: "按街道查询",
-        to: "",
-        visible: true,
-        submenu: [
+
+        // icon: "",
+        // title: "按街道查询",
+        // to: "",
+        // visible: true,
+        // submenu: [
           { icon: "", title: "全区", to: "penaltyPoints" },
           {
             icon: "",
@@ -315,8 +315,8 @@ const menuList_submenu = [
             street: "凤凰山街道",
             visible: true,
           },
-        ],
-      },
+        // ],
+      // },
       // {
       //   icon: "",
       //   title: "按管理门类查询",
@@ -459,8 +459,9 @@ const menuList_submenu = [
 
 // 为扬尘治理模块创建特殊的子菜单，包含案件办理选项
 const menuList_submenu_dust = [
+
+  {icon: "03,17", title: "治理实效", to: "dustControlEffect", submenu: [] },
   ...menuList_submenu,  // 展开现有的所有子菜单项
-  {icon: "03,17", title: "扬尘治理实效", to: "dustControlEffect", submenu: [] },
   { icon: "03,17", title: "案件办理", to: "caseHandling", submenu: [] },
   { icon: "03,17", title: "巡查登记", to: "inspectionRegistry", submenu: [] },
   { icon: "03,17", title: "智能分析", to: "dataAnalysis", submenu: [] }

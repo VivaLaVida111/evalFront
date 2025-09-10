@@ -2,7 +2,7 @@
   <el-container>
     <el-header style="font-size: 25px; padding: 5px">
       <h5 class="card-title" style="font-size: 30px; padding: 5px">
-        评分规则
+        运行规则
         <el-button
           v-if="params.role.includes('管理者')"
           type="primary"
@@ -21,7 +21,7 @@
         class="data-table"
       >
         <el-table-column
-          label="评分项"
+          label="运行项目"
           min-width="150"
           header-align="center"
           align="center"

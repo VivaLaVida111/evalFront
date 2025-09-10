@@ -3,7 +3,7 @@
     <h5 class="card-title" style="font-size: 30px; padding: 5px; margin-right: 20px;">
       扬尘治理实效
     </h5>
-    <div ref="horizontal_bar1" style="width: 100%; height: 400px;"></div>
+    <div ref="horizontal_bar1" style="width: 100%; height: 400px; margin-bottom: 100px;"></div>
     <div ref="pie_chart" style="width: 100%; height: 300px;"></div>
   </div>
 </template>
