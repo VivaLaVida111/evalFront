@@ -5,7 +5,7 @@
           巡查登记录入
         </h5>
         <el-button type="primary" @click="showOptionalEntry" style="margin-right: 10px;">选项式录入</el-button>
-        <el-button type="primary" @click="showTableEntry">表格式录入</el-button>
+<!--        <el-button type="primary" @click="showTableEntry">表格式录入</el-button>-->
       </el-header>
       <div v-if="currentView === 'OptionalEntry'">
         <InspectionRegistryOptional />

@@ -47,26 +47,26 @@
             />
           </el-select>
         </el-form-item>
-        <el-form-item label="加减分">
-          <button 
-            class="btn-decrement" 
-            @click="decrement"
-            :disabled="detailData.input <= min"
-          >-</button>
-          <input
-            v-model="detailData.input"
-            type="number"
-            :min="min" :max="max"
-            :step="step"
-            @change="validateInput"
-            class="input-field"
-          />
-          <button 
-            class="btn-increment" 
-            @click="increment"
-            :disabled="detailData.input >= max"
-          >+</button>
-        </el-form-item>
+<!--        <el-form-item label="加减分">-->
+<!--          <button -->
+<!--            class="btn-decrement" -->
+<!--            @click="decrement"-->
+<!--            :disabled="detailData.input <= min"-->
+<!--          >-</button>-->
+<!--          <input-->
+<!--            v-model="detailData.input"-->
+<!--            type="number"-->
+<!--            :min="min" :max="max"-->
+<!--            :step="step"-->
+<!--            @change="validateInput"-->
+<!--            class="input-field"-->
+<!--          />-->
+<!--          <button -->
+<!--            class="btn-increment" -->
+<!--            @click="increment"-->
+<!--            :disabled="detailData.input >= max"-->
+<!--          >+</button>-->
+<!--        </el-form-item>-->
         <el-form-item label="巡查状态">
           <!-- <el-select v-model="inspectionRecord.patrolStatus" placeholder="选择巡查状态">
             <el-option
