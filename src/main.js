@@ -32,6 +32,8 @@ import "./permission.js";
 
 
 
+// 🟩 新增：应用启动前，就开始加载所有体征数据
+
 
 createApp(App)
     .use(router)

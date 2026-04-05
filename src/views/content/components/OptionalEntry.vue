@@ -21,6 +21,7 @@
             clearable
             v-model="localFormData.bigRulesId"
             @change="onBigRulesChange"
+            disabled
           >
             <el-option
               v-for="(rule, index) in filteredDetailRules"
@@ -71,6 +72,54 @@
         </el-form-item>
       </el-form>
 <!--      <div ref="chartContainer" style="width: 100%; height: 400px"></div>-->
+
+<!--      <el-divider content-position="left">考核得分表</el-divider>-->
+
+<!--      <el-table-->
+<!--          :data="tableRows"-->
+<!--          border-->
+<!--          style="width: 100%"-->
+<!--          header-align="center"-->
+<!--          size="large"-->
+<!--      >-->
+<!--        &lt;!&ndash; 街办 &ndash;&gt;-->
+<!--        <el-table-column prop="street" label="街办" min-width="120" />-->
+
+<!--        &lt;!&ndash; 市级巡查（20） &ndash;&gt;-->
+<!--        <el-table-column label="市级巡查（20）" align="center">-->
+<!--          <el-table-column prop="sj_found"  label="发现问题（10）" min-width="110" align="center" />-->
+<!--          <el-table-column prop="sj_unrect" label="未整改、未整改到位、虚假整改（10）" min-width="180" align="center" />-->
+<!--        </el-table-column>-->
+
+<!--        &lt;!&ndash; 区级巡查（30） &ndash;&gt;-->
+<!--        <el-table-column label="区级巡查（30）" align="center">-->
+<!--          <el-table-column prop="qj_found"  label="发现问题（15）" min-width="110" align="center" />-->
+<!--          <el-table-column prop="qj_unrect" label="未整改、未整改到位、虚假整改（15）" min-width="180" align="center" />-->
+<!--        </el-table-column>-->
+
+<!--        &lt;!&ndash; 街道自查（35） &ndash;&gt;-->
+<!--        <el-table-column label="街道自查（35）" align="center">-->
+<!--          <el-table-column prop="jd_unpatrol" label="未按期巡查" min-width="110" align="center" />-->
+<!--        </el-table-column>-->
+
+<!--        &lt;!&ndash; 案件办理（5） &ndash;&gt;-->
+<!--        <el-table-column label="案件办理（5）" align="center">-->
+<!--          <el-table-column prop="aj_score" label="得分" min-width="80" align="center" />-->
+<!--        </el-table-column>-->
+
+<!--        &lt;!&ndash; 其他（10） &ndash;&gt;-->
+<!--        <el-table-column label="其他（10）" align="center">-->
+<!--&lt;!&ndash;          <el-table-column prop="qt_rule"  label="原则上不扣分" min-width="110" align="center" />&ndash;&gt;-->
+<!--          <el-table-column prop="qt_score" label="得分" min-width="80"  align="center" />-->
+<!--        </el-table-column>-->
+
+<!--        &lt;!&ndash; 总得分（前端计算） &ndash;&gt;-->
+<!--        <el-table-column label="总得分" min-width="100" align="center">-->
+<!--          <template #default="{ row }">-->
+<!--            {{ totalOf(row) }}-->
+<!--          </template>-->
+<!--        </el-table-column>-->
+<!--      </el-table>-->
     </el-main>
   </template>
   
@@ -364,4 +413,41 @@
       }
     }
   );
+
+
+  // 手动静态写死每一格分数：字段名要与表格列的 prop 对齐
+  const tableRows = ref([
+    {
+      street: '驷马桥',
+      sj_found: 9,
+      sj_unrect: 9,
+      qj_found: 14.5,
+      qj_unrect: 14.5,
+      jd_unpatrol: 34.9,
+      aj_score: 0,
+      qt_rule: 1,
+      qt_score: 10,
+    },
+    { street: '西安路', sj_found: 0, sj_unrect: 0, qj_found: 0, qj_unrect: 0, jd_unpatrol: 0, aj_score: 0, qt_rule: 0, qt_score: 0 },
+    { street: '茶店子', sj_found: 0, sj_unrect: 0, qj_found: 0, qj_unrect: 0, jd_unpatrol: 0, aj_score: 0, qt_rule: 0, qt_score: 0 },
+    { street: '五块石', sj_found: 0, sj_unrect: 0, qj_found: 0, qj_unrect: 0, jd_unpatrol: 0, aj_score: 0, qt_rule: 0, qt_score: 0 },
+    { street: '金泉',   sj_found: 0, sj_unrect: 0, qj_found: 0, qj_unrect: 0, jd_unpatrol: 0, aj_score: 0, qt_rule: 0, qt_score: 0 },
+    { street: '凤凰上', sj_found: 0, sj_unrect: 0, qj_found: 0, qj_unrect: 0, jd_unpatrol: 0, aj_score: 0, qt_rule: 0, qt_score: 0 },
+    { street: '营门口', sj_found: 0, sj_unrect: 0, qj_found: 0, qj_unrect: 0, jd_unpatrol: 0, aj_score: 0, qt_rule: 0, qt_score: 0 },
+    { street: '抚琴', sj_found: 0, sj_unrect: 0, qj_found: 0, qj_unrect: 0, jd_unpatrol: 0, aj_score: 0, qt_rule: 0, qt_score: 0 },
+    { street: '九里堤',   sj_found: 0, sj_unrect: 0, qj_found: 0, qj_unrect: 0, jd_unpatrol: 0, aj_score: 0, qt_rule: 0, qt_score: 0 },
+    // ...继续补其它行
+  ])
+
+  // 计算总分（空值按 0 处理）
+  const totalOf = (row) => {
+    const nums = [
+      row.sj_found, row.sj_unrect,
+      row.qj_found, row.qj_unrect,
+      row.jd_unpatrol,
+      row.aj_score,
+      row.qt_rule, row.qt_score
+    ].map(v => Number(v) || 0)
+    return nums.reduce((a, b) => a + b, 0).toFixed(1)
+  }
   </script>

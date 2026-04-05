@@ -79,71 +79,80 @@
       <div class="columns">
         <div class="no">
           <h2 style="font-size: 0.2rem; color: #ffffff;">整治成效：好</h2>
+
+          <!-- 第一行：前 5 个系统 -->
           <div class="no-hd">
             <ul>
-              <!-- 第一行显示前5个数据的分数 -->
               <li
-                v-for="(rule, index) in bigRulesStatistics.slice(0, 5)"
-                :key="'score-' + index"
-                @click="toPenalty(rule.item)"
+                  v-for="(rule, index) in sortedBigRulesStatistics.slice(0, 5)"
+                  :key="'score-' + index"
+                  @click="toPenalty(rule.name)"
               >
-                {{ parseFloat(rule.score).toFixed(2) }}
+                {{ Number(rule?.avgScore ?? 0).toFixed(2) }}
+              </li>
+              <!-- 补足到 5 个 -->
+              <li
+                  v-for="index in Math.max(0, 5 - sortedBigRulesStatistics.length)"
+                  :key="'empty-score-row1-' + index"
+              >
+                0.00
               </li>
             </ul>
           </div>
           <div class="no-bd">
             <ul>
-              <!-- 第一行显示前5个数据的项目名 -->
               <li
-                v-for="(rule, index) in bigRulesStatistics.slice(0, 5)"
-                :key="'item-' + index"
+                  v-for="(rule, index) in sortedBigRulesStatistics.slice(0, 5)"
+                  :key="'item-' + index"
               >
-                {{ rule.item }}
+                {{ rule.name }}
+              </li>
+              <li
+                  v-for="index in Math.max(0, 5 - sortedBigRulesStatistics.length)"
+                  :key="'empty-item-row1-' + index"
+              >
+                系统{{ index }}
               </li>
             </ul>
           </div>
 
-          <!-- 添加第二行数据 -->
+          <!-- 第二行：第 6~9 个系统 -->
           <div class="no-hd">
             <ul>
-              <!-- 第二行显示后4个数据的分数 -->
               <li
-                v-for="(rule, index) in bigRulesStatistics.slice(5, 9)"
-                :key="'score2-' + index"
-                @click="toPenalty(rule.item)"
+                  v-for="(rule, index) in sortedBigRulesStatistics.slice(5, 9)"
+                  :key="'score2-' + index"
+                  @click="toPenalty(rule.name)"
               >
-                {{ parseFloat(rule.score).toFixed(2) }}
+                {{ Number(rule?.avgScore ?? 0).toFixed(2) }}
               </li>
-              <!-- 如果不足9个数据，用空白补齐到4个位置 -->
               <li
-                v-if="bigRulesStatistics.length < 9"
-                v-for="index in 9 - Math.max(bigRulesStatistics.length, 5)"
-                :key="'empty-score-' + index"
+                  v-for="index in Math.max(0, 9 - Math.max(sortedBigRulesStatistics.length, 5))"
+                  :key="'empty-score-row2-' + index"
               >
-                0
+                0.00
               </li>
             </ul>
           </div>
           <div class="no-bd">
             <ul>
-              <!-- 第二行显示后4个数据的项目名 -->
               <li
-                v-for="(rule, index) in bigRulesStatistics.slice(5, 9)"
-                :key="'item2-' + index"
+                  v-for="(rule, index) in sortedBigRulesStatistics.slice(5, 9)"
+                  :key="'item2-' + index"
               >
-                {{ rule.item }}
+                {{ rule.name }}
               </li>
-              <!-- 如果不足9个数据，用默认文本补齐到4个位置 -->
               <li
-                v-if="bigRulesStatistics.length < 9"
-                v-for="index in 9 - Math.max(bigRulesStatistics.length, 5)"
-                :key="'empty-item-' + index"
+                  v-for="index in Math.max(0, 9 - Math.max(sortedBigRulesStatistics.length, 5))"
+                  :key="'empty-item-row2-' + index"
               >
-                数据{{ index + 5 }}
+                系统{{ index + 5 }}
               </li>
             </ul>
           </div>
         </div>
+
+
 
         <div class="mapDiv">
           <!-- <MapContent /> -->
@@ -220,7 +229,12 @@ import { params } from "@/store/store.js";
 import { getBigRulesStatistics } from "@/api/home.js";
 
 import moment from "moment";
+import {buildRoleRows,ROLE_TABLE_MAP} from "@/views/content/components/roleScoreConfig";
+import { preloadAllScoreData } from '@/views/content/components/roleScoreConfig'
 
+onMounted(() => {
+  preloadAllScoreData()   // 🚀 全局预载一次
+})
 // ========================================================sunny
 function logout() {
   //TODO 清除登录信息
@@ -2092,38 +2106,117 @@ const horizontalOpt = {
 };
 
 let horizontalBar = null;
-//创建左侧柱状图
-const create_horizontal_bar = async () => {
-  try {
-    let chartDom = document.getElementById("horizontal_bar");
-    horizontalBar = echarts.init(chartDom);
+// 所有要参与统计的系统（就用 ROLE_TABLE_MAP 的键，或者你也可以手动列）
+const ALL_ROLES = Object.keys(ROLE_TABLE_MAP)
+// 也可以显式写死顺序：
+// const ALL_ROLES = [
+//   '环境卫生','市容秩序','广告招牌','扬尘治理',
+//   '数字城管','网络理政','油烟治理','违法建设','共享单车',
+// ]
 
-    await getScores(start, end);
+// 统计：街道 -> { sum: 累计总分, cnt: 参与系统数 }
+function recomputeStreetScoresFromRoleTables () {
+  const agg = Object.create(null)
 
-    // 根据分数排序数据（从高到低排序）
-    const combinedData = streetsList.map((street, index) => ({
-      street: street,
-      score: scoresList[index],
-    }));
+  // 遍历每一个系统
+  for (const roleName of ALL_ROLES) {
+    const cfg = buildRoleRows(roleName)
+    if (!cfg || !cfg.rows) continue
 
-    combinedData.sort((a, b) => b.score - a.score); // 倒序排序
+    for (const row of cfg.rows) {
+      const street = row.street
+      if (!street) continue
 
-    // 重新提取排序后的数据
-    const sortedStreets = combinedData.map((item) => item.street);
-    const sortedScores = combinedData.map((item) => item.score);
+      const total = Number(row.total ?? 0) || 0
 
-    horizontalOpt.yAxis.data = sortedStreets;
-    horizontalOpt.series[0].data = sortedScores;
-
-    horizontalBar.setOption(horizontalOpt);
-    window.addEventListener("resize", horizontalBar.resize);
-  } catch (error) {
-    console.error("Failed to create horizontal bar chart:", error);
+      if (!agg[street]) {
+        agg[street] = { sum: 0, cnt: 0 }
+      }
+      agg[street].sum += total
+      agg[street].cnt += 1
+    }
   }
-};
 
+  // 把结果整理成数组，并算出平均分
+  const list = Object.entries(agg).map(([street, { sum, cnt }]) => {
+    const avg = cnt > 0 ? sum / cnt : 0
+    return {
+      street,
+      score: Number(avg.toFixed(2)),
+    }
+  })
+
+  // 按分数从高到低排序（分数越高排越前）
+  list.sort((a, b) => b.score - a.score)
+
+  // 填充到 streetsList / scoresList（保持响应式）
+  streetsList.splice(0, streetsList.length)
+  scoresList.splice(0, scoresList.length)
+  for (const item of list) {
+    streetsList.push(item.street)
+    scoresList.push(item.score)
+  }
+
+  console.log('[street-rank] streetsList:', streetsList)
+  console.log('[street-rank] scoresList:', scoresList)
+}
+//创建左侧柱状图
+const create_horizontal_bar = () => {
+  try {
+    const chartDom = document.getElementById('horizontal_bar')
+    if (!chartDom) {
+      console.warn('[street-rank] 找不到 #horizontal_bar 容器')
+      return
+    }
+
+    if (!horizontalBar) {
+      horizontalBar = echarts.init(chartDom)
+      window.addEventListener('resize', horizontalBar.resize)
+    }
+
+    // ⭐ 关键：从所有系统的表格里重新算一遍每个街道的平均分
+    recomputeStreetScoresFromRoleTables()
+
+    // 此时 streetsList / scoresList 已经是“按平均分降序排列”的
+    horizontalOpt.yAxis.data = streetsList
+    horizontalOpt.series[0].data = scoresList
+
+    horizontalBar.setOption(horizontalOpt)
+  } catch (error) {
+    console.error('Failed to create horizontal bar chart:', error)
+  }
+}
+const ROLE_LIST = [
+  "环境卫生",
+  "市容秩序",
+  "广告招牌",
+  "扬尘治理",
+  "数字城管",
+  "网络理政",
+  "油烟治理",
+  "违法建设",
+  "共享单车",
+];
+
+// 如果未来有不是 100 分的，可以在这里单独改
+const FULL_SCORE_MAP = {
+  环境卫生: 100,
+  市容秩序: 100,
+  广告招牌: 100,
+  扬尘治理: 100,
+  数字城管: 100,
+  网络理政: 100,
+  油烟治理: 100,
+  违法建设: 100,
+  共享单车: 100,
+};
 //右侧的图
 const bigRulesStatistics = reactive([]);
+const sortedBigRulesStatistics = computed(() => {
+  return bigRulesStatistics
+      .slice() // 拷贝一份，避免改动原数组
+      .sort((a, b) => b.avgScore - a.avgScore); // 平均扣分越大，排得越靠前
+});
 const bigRulsList = reactive([]);
 const demeritList = reactive([]);
 const getStatistics = (startTime, endTime) => {
@@ -2165,7 +2258,7 @@ const horizontalOpt1 = {
   },
   yAxis: {
     type: "category",
-    data: bigRulsList,
+    data: [], // 填充大项规则
     inverse: true,
     animationDuration: 0,
     animationDurationUpdate: 0,
@@ -2176,7 +2269,7 @@ const horizontalOpt1 = {
       realtimeSort: false,
       name: "大项规则",
       type: "bar",
-      data: demeritList,
+      data: [], // 填充得分数据
       label: {
         show: true,
         position: "right",
@@ -2196,13 +2289,70 @@ const horizontalOpt1 = {
   animationEasing: "linear",
   animationEasingUpdate: "linear",
 };
+// const horizontalOpt1 = {
+//   xAxis: {
+//     max: "dataMax",
+//     animation: false,
+//   },
+//   yAxis: {
+//     type: "category",
+//     data: bigRulsList,
+//     inverse: true,
+//     animationDuration: 0,
+//     animationDurationUpdate: 0,
+//     max: 9,
+//   },
+//   series: [
+//     {
+//       realtimeSort: false,
+//       name: "大项规则",
+//       type: "bar",
+//       data: demeritList,
+//       label: {
+//         show: true,
+//         position: "right",
+//         valueAnimation: false,
+//       },
+//     },
+//   ],
+//   legend: {
+//     show: true,
+//   },
+//   grid: {
+//     left: "17%",
+//   },
+//   animation: false,
+//   animationDuration: 0,
+//   animationDurationUpdate: 0,
+//   animationEasing: "linear",
+//   animationEasingUpdate: "linear",
+// };
 
 let pieChart = null;
-//饼状图
+// 饼状图：各系统「平均扣分」的占比
 const createPieChart = () => {
   const pieDom = document.getElementById("pie_chart");
-  if (!pieDom) return;
-  pieChart = echarts.init(pieDom);
+  if (!pieDom) {
+    console.warn("[pie] 找不到 #pie_chart 容器");
+    return;
+  }
+
+  if (!pieChart) {
+    pieChart = echarts.init(pieDom);
+    window.addEventListener("resize", pieChart.resize);
+  }
+
+  // 使用前一步计算好的 bigRulesStatistics
+  const raw = bigRulesStatistics.map((item) => ({
+    name: item.name,
+    value: Number(item.avgDeduct || 0),
+  }));
+
+  // 过滤全 0 的情况
+  let pieData = raw.filter((d) => d.value > 0);
+  if (!pieData.length) {
+    pieData = [{ name: "暂无扣分数据", value: 1 }];
+  }
 
   const pieOption = {
     tooltip: {
@@ -2217,14 +2367,9 @@ const createPieChart = () => {
     },
     series: [
       {
-        // name: "扣分占比",
         type: "pie",
         radius: "100%",
-        // top: "5%",
-        data: bigRulesStatistics.map((item) => ({
-          name: item.item,
-          value: Math.abs(item.score),
-        })),
+        data: pieData,
         emphasis: {
           itemStyle: {
             shadowBlur: 10,
@@ -2236,40 +2381,142 @@ const createPieChart = () => {
     ],
   };
 
-  pieChart.setOption(pieOption);
-  window.addEventListener("resize", pieChart.resize);
+  pieChart.setOption(pieOption, true);
 };
 //柱状图
 let horizontalBar1 = null;
-const create_horizontal_bar1 = async () => {
-  try {
-    let chartDom = document.getElementById("horizontal_bar1");
-    horizontalBar1 = echarts.init(chartDom);
-
-    await getStatistics(start, end);
-
-    // 根据分数排序数据（从高到低排序）
-    const combinedData = bigRulsList.map((rule, index) => ({
-      rule: rule,
-      demerit: demeritList[index],
-    }));
-
-    combinedData.sort((a, b) => b.demerit - a.demerit); // 倒序排序
-
-    // 重新提取排序后的数据
-    const sortedRules = combinedData.map((item) => item.rule);
-    const sortedDemerits = combinedData.map((item) => item.demerit);
-
-    horizontalOpt1.yAxis.data = sortedRules;
-    horizontalOpt1.series[0].data = sortedDemerits;
-
-    horizontalBar1.setOption(horizontalOpt1);
-    createPieChart();
-    window.addEventListener("resize", horizontalBar1.resize);
-  } catch (error) {
-    console.error("Failed to create horizontal bar chart:", error);
+// 右侧柱状图：各系统平均总分
+const create_horizontal_bar1 = () => {
+  const chartDom = document.getElementById("horizontal_bar1");
+  if (!chartDom) {
+    console.warn("[bar] 找不到 #horizontal_bar1 容器");
+    return;
   }
+
+  if (!horizontalBar1) {
+    horizontalBar1 = echarts.init(chartDom);
+    window.addEventListener("resize", horizontalBar1.resize);
+  }
+
+  // 1. 先把旧统计清空
+  bigRulesStatistics.splice(0, bigRulesStatistics.length);
+
+  // 2. 逐个系统用 buildRoleRows 聚合
+  ROLE_LIST.forEach((roleName) => {
+    const cfg = buildRoleRows(roleName);
+    if (!cfg || !cfg.rows || cfg.rows.length === 0) {
+      console.warn("[bar] 系统无数据：", roleName);
+      bigRulesStatistics.push({
+        name: roleName,
+        avgScore: 0,
+        avgDeduct: 0,
+      });
+      return;
+    }
+
+    const totals = cfg.rows.map((r) => Number(r.total ?? 0) || 0);
+    const sum = totals.reduce((acc, x) => acc + x, 0);
+    const avgScoreRaw = totals.length ? sum / totals.length : 0;
+    const full = FULL_SCORE_MAP[roleName] ?? 100;
+    const avgScore = Number(avgScoreRaw.toFixed(2));
+    const avgDeduct = Number(Math.max(0, full - avgScore).toFixed(2));
+
+    bigRulesStatistics.push({
+      name: roleName,
+      avgScore,
+      avgDeduct,
+    });
+  });
+
+  console.log("[bar] bigRulesStatistics:", JSON.parse(JSON.stringify(bigRulesStatistics)));
+
+  // 3. 按平均总分从高到低排序（你也可以按扣分排，这里听你的需求）
+  const sorted = [...bigRulesStatistics].sort((a, b) => b.avgScore - a.avgScore);
+
+  const yNames = sorted.map((it) => it.name);
+  const barValues = sorted.map((it) => it.avgScore);
+
+  // 4. 更新配置并渲染
+  const horizontalOpt1 = {
+    xAxis: {
+      max: "dataMax",
+      animation: false,
+    },
+    yAxis: {
+      type: "category",
+      data: yNames,
+      inverse: true,
+      animationDuration: 0,
+      animationDurationUpdate: 0,
+      max: ROLE_LIST.length, // 至多展示所有系统
+    },
+    series: [
+      {
+        realtimeSort: false,
+        name: "系统平均总分",
+        type: "bar",
+        data: barValues,
+        label: {
+          show: true,
+          position: "right",
+          valueAnimation: false,
+        },
+      },
+    ],
+    legend: {
+      show: true,
+    },
+    grid: {
+      left: "17%",
+    },
+    animation: false,
+    animationDuration: 0,
+    animationDurationUpdate: 0,
+    animationEasing: "linear",
+    animationEasingUpdate: "linear",
+  };
+
+  // 如果完全没数据，也渲染一个骨架，避免整块空白
+  if (!yNames.length) {
+    horizontalOpt1.yAxis.data = ROLE_LIST;
+    horizontalOpt1.series[0].data = ROLE_LIST.map(() => 0);
+  }
+
+  horizontalBar1.setOption(horizontalOpt1, true);
+
+  // 5. 柱状图准备好后，顺手刷新饼图
+  createPieChart();
 };
+
+// const create_horizontal_bar1 = async () => {
+//   try {
+//     let chartDom = document.getElementById("horizontal_bar1");
+//     horizontalBar1 = echarts.init(chartDom);
+//
+//     await getStatistics(start, end);
+//
+//     // 根据分数排序数据（从高到低排序）
+//     const combinedData = bigRulsList.map((rule, index) => ({
+//       rule: rule,
+//       demerit: demeritList[index],
+//     }));
+//
+//     combinedData.sort((a, b) => b.demerit - a.demerit); // 倒序排序
+//
+//     // 重新提取排序后的数据
+//     const sortedRules = combinedData.map((item) => item.rule);
+//     const sortedDemerits = combinedData.map((item) => item.demerit);
+//
+//     horizontalOpt1.yAxis.data = sortedRules;
+//     horizontalOpt1.series[0].data = sortedDemerits;
+//
+//     horizontalBar1.setOption(horizontalOpt1);
+//     createPieChart();
+//     window.addEventListener("resize", horizontalBar1.resize);
+//   } catch (error) {
+//     console.error("Failed to create horizontal bar chart:", error);
+//   }
+// };
 
 // ======================================================================================================sunny
 /**

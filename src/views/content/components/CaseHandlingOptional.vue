@@ -24,26 +24,26 @@
             placeholder="请输入处罚事由"
           ></el-input>
         </el-form-item>
-        <el-form-item label="加减分">
-          <button 
-            class="btn-decrement" 
-            @click="decrement"
-            :disabled="detailData.input <= min"
-          >-</button>
-          <input
-            class="input-field"
-            v-model="detailData.input"
-            type="number"
-            :min="min" :max="max"
-            :step="step"
-            @change="validateInput"
-          />
-          <button 
-            class="btn-increment" 
-            @click="increment"
-            :disabled="detailData.input >= max"
-          >+</button>
-        </el-form-item>
+<!--        <el-form-item label="加减分">-->
+<!--          <button -->
+<!--            class="btn-decrement" -->
+<!--            @click="decrement"-->
+<!--            :disabled="detailData.input <= min"-->
+<!--          >-</button>-->
+<!--          <input-->
+<!--            class="input-field"-->
+<!--            v-model="detailData.input"-->
+<!--            type="number"-->
+<!--            :min="min" :max="max"-->
+<!--            :step="step"-->
+<!--            @change="validateInput"-->
+<!--          />-->
+<!--          <button -->
+<!--            class="btn-increment" -->
+<!--            @click="increment"-->
+<!--            :disabled="detailData.input >= max"-->
+<!--          >+</button>-->
+<!--        </el-form-item>-->
         <el-form-item label="备注">
           <el-input
             v-model="caseRecord.remark"

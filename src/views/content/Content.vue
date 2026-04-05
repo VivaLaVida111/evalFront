@@ -334,26 +334,95 @@ const menuList_submenu = [
 // 为扬尘治理模块创建特殊的子菜单，包含案件办理选项
 const menuList_submenu_dust = [
 
-  {icon: "03,17", title: "治理实效", to: "dustControlEffect", submenu: [] },
+  {icon: "03,17", title: "治理实效", to: "newDustControlEffect", submenu: [] },
   ...menuList_submenu,  // 展开现有的所有子菜单项
   { icon: "03,17", title: "案件办理", to: "caseHandling", submenu: [] },
   { icon: "03,17", title: "巡查登记", to: "inspectionRegistry", submenu: [] },
   { icon: "03,17", title: "智能分析", to: "dataAnalysis", submenu: [] }
 ]
 
+//违法建设
+const menuList_submenu_wfjs = [
+// TODO 做治理实效
+  {icon: "03,17", title: "治理实效", to: "wfjsControlEffect", submenu: [] },
+  ...menuList_submenu,  // 展开现有的所有子菜单项
+  { icon: "03,17", title: "违建拆除", to: "illegalConstructExcel", submenu: [] },
+  { icon: "03,17", title: "案件办理", to: "caseHandling", submenu: [] },
+]
 
+//广告招牌
+const menuList_submenu_ggzp = [
+// TODO 做治理实效
+  {icon: "03,17", title: "治理实效", to: "ggzpControlEffect", submenu: [] },
+  ...menuList_submenu,  // 展开现有的所有子菜单项
+  { icon: "03,17", title: "巡查登记", to: "inspectionRegistryGgzp", submenu: [] },
+]
+
+//油烟治理
+const menuList_submenu_yyzl = [
+// TODO 做治理实效
+  {icon: "03,17", title: "治理实效", to: "yyzlControlEffect", submenu: [] },
+  ...menuList_submenu,  // 展开现有的所有子菜单项
+  { icon: "03,17", title: "案件办理", to: "caseHandling", submenu: [] },
+]
+
+//市容秩序
+const menuList_submenu_srzx = [
+// TODO 做治理实效
+  {icon: "03,17", title: "治理实效", to: "srzxControlEffect", submenu: [] },
+  ...menuList_submenu,  // 展开现有的所有子菜单项
+  { icon: "03,17", title: "队伍风纪检查", to: "inspectionRegistrySrzx", submenu: [] },
+]
+
+//环境卫生
+const menuList_submenu_hjws = [
+// TODO 做治理实效
+  {icon: "03,17", title: "治理实效", to: "hjwsControlEffect", submenu: [] },
+  ...menuList_submenu,  // 展开现有的所有子菜单项
+  { icon: "03,17", title: "实地检查", to: "inspectionRegistryHjws", submenu: [] },
+]
+
+//共享单车
+const menuList_submenu_gxdc = [
+// TODO 做治理实效
+  {icon: "03,17", title: "治理实效", to: "gxdcControlEffect", submenu: [] },
+  ...menuList_submenu,  // 展开现有的所有子菜单项
+]
+
+//数字城管
+const menuList_submenu_szcg = [
+// TODO 做治理实效
+  {icon: "03,17", title: "治理实效", to: "szcgControlEffect", submenu: [] },
+  ...menuList_submenu,  // 展开现有的所有子菜单项
+]
+
+//网络理政
+const menuList_submenu_wllz = [
+// TODO 做治理实效
+  {icon: "03,17", title: "治理实效", to: "wllzControlEffect", submenu: [] },
+  ...menuList_submenu,  // 展开现有的所有子菜单项
+]
+
+//净优亮美
+const menuList_submenu_jylm = [
+// TODO 做治理实效
+  {icon: "03,17", title: "基础激励", to: "basicReward", submenu: [] },
+  {icon: "03,17", title: "重点激励", to: "importantReward", submenu: [] },
+
+]
 // 这个应该从后台请求获得
 const menuList = [
   { icon: "03,17", title: "体征运行规则", to: "ruleConfig", submenu: [] },
-  { icon: "03,17", title: "环境卫生", to: "", submenu: menuList_submenu },
-  { icon: "03,17", title: "市容秩序", to: "", submenu: menuList_submenu },
-  { icon: "03,17", title: "广告招牌", to: "", submenu: menuList_submenu },
+  { icon: "03,17", title: "环境卫生", to: "", submenu: menuList_submenu_hjws },
+  { icon: "03,17", title: "市容秩序", to: "", submenu: menuList_submenu_srzx },
+  { icon: "03,17", title: "广告招牌", to: "", submenu: menuList_submenu_ggzp },
   { icon: "03,17", title: "扬尘治理", to: "", submenu: menuList_submenu_dust },
-  { icon: "03,17", title: "固体废弃物处置及垃圾分类", to: "",submenu: menuList_submenu},
-  { icon: "03,17", title: "数字化常态监管", to: "", submenu: menuList_submenu },
-  { icon: "03,17", title: "网络理政", to: "", submenu: menuList_submenu },
-  { icon: "03,17", title: "油烟治理", to: "", submenu: menuList_submenu},
-  { icon: "03,17", title: "违法建设", to: "", submenu: menuList_submenu}
+  { icon: "03,17", title: "共享单车", to: "",submenu: menuList_submenu_gxdc},
+  { icon: "03,17", title: "数字城管", to: "", submenu: menuList_submenu_szcg },
+  { icon: "03,17", title: "网络理政", to: "", submenu: menuList_submenu_wllz },
+  { icon: "03,17", title: "油烟治理", to: "", submenu: menuList_submenu_yyzl},
+  { icon: "03,17", title: "违法建设", to: "", submenu: menuList_submenu_wfjs},
+  { icon: "03,17", title: "净优亮美", to: "", submenu: menuList_submenu_jylm},
   // { icon: "02,14",title: "体征事件查询",to: "penaltyPoints",
   //   submenu: [
   //     {

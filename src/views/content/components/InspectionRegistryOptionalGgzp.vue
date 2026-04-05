@@ -15,8 +15,33 @@
         <el-form-item label="巡查编号">
           <el-input v-model="inspectionRecord.inspectionNumber" style="width: 1000px" placeholder="请输入巡查编号"></el-input>
         </el-form-item>
-        <el-form-item label="工地名称">
-          <el-input v-model="inspectionRecord.siteName" style="width: 1000px" placeholder="请输入工地名称"></el-input>
+        <el-form-item label="下发时间">
+          <el-date-picker
+              v-model="inspectionRecord.patrolTime"
+              type="datetime"
+              placeholder="选择整改时间"
+              format="YYYY-MM-DD HH:mm:ss"
+              value-format="YYYY-MM-DDTHH:mm:ss"
+          ></el-date-picker>
+        </el-form-item>
+        <el-form-item label="整改时间">
+          <el-date-picker
+              v-model="inspectionRecord.patrolTime"
+              type="datetime"
+              placeholder="选择整改时间"
+              format="YYYY-MM-DD HH:mm:ss"
+              value-format="YYYY-MM-DDTHH:mm:ss"
+          ></el-date-picker>
+        </el-form-item>
+        <el-form-item label="所属街道">
+          <el-select v-model="inspectionRecord.street" placeholder="选择街道">
+            <el-option
+                v-for="street in streets"
+                :key="street.value"
+                :label="street.label"
+                :value="street.value"
+            />
+          </el-select>
         </el-form-item>
         <el-form-item label="详细地址">
           <el-input
@@ -27,87 +52,14 @@
             placeholder="请输入详细地址"
           ></el-input>
         </el-form-item>
-        <el-form-item label="所属街道">
-          <el-select v-model="inspectionRecord.street" placeholder="选择街道">
-            <el-option
-              v-for="street in streets"
-              :key="street.value"
-              :label="street.label"
-              :value="street.value"
-            />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="问题属性">
-          <el-select v-model="inspectionRecord.atrribute" placeholder="选择问题属性">
-            <el-option
-              v-for="attr in attributes"
-              :key="attr.value"
-              :label="attr.label"
-              :value="attr.value"
-            />
-          </el-select>
-        </el-form-item>
-<!--        <el-form-item label="加减分">-->
-<!--          <button -->
-<!--            class="btn-decrement" -->
-<!--            @click="decrement"-->
-<!--            :disabled="detailData.input <= min"-->
-<!--          >-</button>-->
-<!--          <input-->
-<!--            v-model="detailData.input"-->
-<!--            type="number"-->
-<!--            :min="min" :max="max"-->
-<!--            :step="step"-->
-<!--            @change="validateInput"-->
-<!--            class="input-field"-->
-<!--          />-->
-<!--          <button -->
-<!--            class="btn-increment" -->
-<!--            @click="increment"-->
-<!--            :disabled="detailData.input >= max"-->
-<!--          >+</button>-->
-<!--        </el-form-item>-->
-<!--        <el-form-item label="巡查状态">-->
-<!--          &lt;!&ndash; <el-select v-model="inspectionRecord.patrolStatus" placeholder="选择巡查状态">-->
-<!--            <el-option-->
-<!--              v-for="status in patrolStatuses"-->
-<!--              :key="status.value"-->
-<!--              :label="status.label"-->
-<!--              :value="status.value"-->
-<!--            />-->
-<!--          </el-select> &ndash;&gt;-->
-<!--          <el-input -->
-<!--            v-model="inspectionRecord.patrolStatus" -->
-<!--            placeholder="巡查状态"-->
-<!--            style="width: 1000px"-->
-<!--          ></el-input>-->
-<!--        </el-form-item>-->
-        <el-form-item label="巡查状态">
-          <el-select
-              v-model="inspectionRecord.patrolStatus"
-              placeholder="选择巡查状态"
-              clearable
-              style="width: 300px"
-          >
-            <el-option
-                v-for="opt in patrolStatuses"
-                :key="opt.value"
-                :label="opt.label"
-                :value="opt.value"
-            />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="巡查时间">
-          <el-date-picker
-            v-model="inspectionRecord.patrolTime"
-            type="datetime"
-            placeholder="选择巡查时间"
-            format="YYYY-MM-DD HH:mm:ss"
-            value-format="YYYY-MM-DDTHH:mm:ss"
-          ></el-date-picker>
-        </el-form-item>
-        <el-form-item label="巡查人">
-          <el-input v-model="inspectionRecord.patroller" style="width: 300px" placeholder="请输入巡查人姓名"></el-input>
+        <el-form-item label="存在问题">
+          <el-input
+              v-model="inspectionRecord.detailSite"
+              style="width: 1000px"
+              type="textarea"
+              rows="2"
+              placeholder="请输入详细地址"
+          ></el-input>
         </el-form-item>
         <el-form-item label="核查状态">
           <el-select v-model="inspectionRecord.checkStatus" placeholder="选择核查状态">
@@ -118,6 +70,12 @@
               :value="status.value"
             />
           </el-select>
+        </el-form-item>
+        <el-form-item label="情况说明">
+          <el-input v-model="inspectionRecord.inspectionNumber" style="width: 1000px" placeholder="请输入巡查编号"></el-input>
+        </el-form-item>
+        <el-form-item label="备注">
+          <el-input v-model="inspectionRecord.inspectionNumber" style="width: 1000px" placeholder="请输入巡查编号"></el-input>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="submit">提交</el-button>
@@ -179,10 +137,7 @@ const checkStatuses = ref([
   { label: "无问题", value: "无问题" },
 ]);
 
-const patrolStatuses = [
-  { label: '已巡查', value: '已巡查' },
-  { label: '未巡查', value: '未巡查' },
-]
+
 //提交
 const submit = () => {
   submitForm();

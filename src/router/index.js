@@ -59,9 +59,29 @@ const routes = [
         component: () => import("@/views/content/components/CaseHandling.vue"),
       },
       {
+        name: "illegalConstructExcel",
+        path: "illegalConstructExcel", // 子组件的path不以/开头
+        component: () => import("@/views/content/components/illegalConstructExcel.vue"),
+      },
+      {
         name: "inspectionRegistry",
         path: "inspectionRegistry", // 子组件的path不以/开头
         component: () => import("@/views/content/components/InspectionRegistry.vue"),
+      },
+      {
+        name: "inspectionRegistryGgzp",
+        path: "inspectionRegistryGgzp", // 子组件的path不以/开头
+        component: () => import("@/views/content/components/InspectionRegistryGgzp.vue"),
+      },
+      {
+        name: "inspectionRegistrySrzx",
+        path: "inspectionRegistrySrzx", // 子组件的path不以/开头
+        component: () => import("@/views/content/components/InspectionRegistrySrzx.vue"),
+      },
+      {
+        name: "inspectionRegistryHjws",
+        path: "inspectionRegistryHjws", // 子组件的path不以/开头
+        component: () => import("@/views/content/components/InspectionRegistryHjws.vue"),
       },
       {
         name: "dataAnalysis",
@@ -71,7 +91,73 @@ const routes = [
       {
         name: "dustControlEffect",
         path: "dustControlEffect", 
-        component: () => import("@/views/content/components/dustControlEffect.vue"),
+        component: () => import("@/views/content/components/controlEffect/dustControlEffect.vue"),
+      },
+      {
+        name: "newDustControlEffect",
+        path: "newDustControlEffect",
+        component: () => import("@/views/content/components/controlEffect/controlEffect.vue"),
+        props: { bigRulesId: 8 }
+      },
+      {
+        name: "wfjsControlEffect",
+        path: "wfjsControlEffect",
+        component: () => import("@/views/content/components/controlEffect/controlEffect.vue"),
+        props: { bigRulesId: 27 }
+      },
+      {
+        name: "ggzpControlEffect",
+        path: "ggzpControlEffect",
+        component: () => import("@/views/content/components/controlEffect/controlEffect.vue"),
+        props: { bigRulesId: 6 }
+      },
+      {
+        name: "yyzlControlEffect",
+        path: "yyzlControlEffect",
+        component: () => import("@/views/content/components/controlEffect/controlEffect.vue"),
+        props: { bigRulesId: 19 }
+      },
+      {
+        name: "srzxControlEffect",
+        path: "srzxControlEffect",
+        component: () => import("@/views/content/components/controlEffect/controlEffect.vue"),
+        props: { bigRulesId: 4 }
+      },
+      {
+        name: "hjwsControlEffect",
+        path: "hjwsControlEffect",
+        component: () => import("@/views/content/components/controlEffect/controlEffect.vue"),
+        props: { bigRulesId: 3 }
+      },
+      {
+        name: "gxdcControlEffect",
+        path: "gxdcControlEffect",
+        component: () => import("@/views/content/components/controlEffect/controlEffect.vue"),
+        props: { bigRulesId: 28 }
+      },
+      {
+        name: "szcgControlEffect",
+        path: "szcgControlEffect",
+        component: () => import("@/views/content/components/controlEffect/controlEffect.vue"),
+        props: { bigRulesId: 17 }
+      },
+      {
+        name: "wllzControlEffect",
+        path: "wllzControlEffect",
+        component: () => import("@/views/content/components/controlEffect/controlEffect.vue"),
+        props: { bigRulesId: 18 }
+      },
+      {
+        name: "basicReward",
+        path: "basicReward",
+        component: () => import("@/views/content/components/basicReward.vue"),
+
+      },
+      {
+        name: "importantReward",
+        path: "importantReward",
+        component: () => import("@/views/content/components/importantReward.vue"),
+
       },
     ],
   },

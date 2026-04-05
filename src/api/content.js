@@ -31,6 +31,13 @@ export function getSmallRulesStatistics(start, end, bigRuleId) {
     })
 }
 
+export function getStreetSmallRulesStatistics(start, end, bigRuleId, street) {
+    return request({
+        url: '/details/streetSmallRulesStatistics/' + start + '/' + end + '/' + bigRuleId + '/' + street,
+        method: 'get'
+    })
+}
+
 export function getDetails(start, end, street) {
     return request({
         url: '/details/period/' + start + '/' + end + '/' + street,
@@ -123,7 +130,13 @@ export function updateSmallRule(data) {
         data
     })
 }
+export function getStreetDailyStatics() {
+    return request({
+        url: '/extra/streetDailyStatics',
+        method: 'get',
 
+    })
+}
 export function formatLocalDateTime() {
     const date = new Date();
     const year = date.getFullYear();
@@ -183,7 +196,14 @@ export function getInspectionRecords(params) {
         params
     })
 }
-
+export function getInspectionRecordsBySystem(params) {
+    return request({
+        url: '/inspection-record/by-system',
+        method: 'get',
+        timeout: 60000,
+        params
+    })
+}
 export function updateInspectionRecord(data) {
     return request({
         url: '/inspection-record',
@@ -247,3 +267,107 @@ export function getCheckByStreetStats(startTime, endTime) {
     })
 }
 
+// Inspection Record API functions
+export function addCityOrderRecord(data) {
+    return request({
+        url: '/city-order-record',
+        method: 'post',
+        data
+    })
+}
+
+
+//实地检查
+export function addEnvHealthSpotCheck(data) {
+    return request({
+        url: '/env-check',
+        method: 'post',
+        data
+    })
+}
+
+export function addDemolitionRecord(data) {
+    return request({
+        url: '/demolition-record',
+        method: 'post',
+        data
+    })
+}
+
+export function getDemolitionRecords() {
+    return request({
+        url: '/demolition-record',
+        method: 'get'
+    })
+}
+
+export function getEnvChecks(params) {
+    return request({
+        url: '/env-check',
+        method: 'get',
+        params
+    })
+}
+
+// 临街店铺管家 —— 招牌审批量
+export function getSignDoorData(month) {
+    return request({
+        url: '/extra/signDoorData',
+        method: 'get',
+        params: { month }
+    })
+}
+
+export function getCityOrderCheckData() {
+    return request({
+        url: '/extra/cityOrderCheckData',
+        method: 'get',
+    })
+}
+
+// 餐饮油烟体征数据
+export function getSootTzData(month) {
+    return request({
+        url: '/extra/sootTzData',
+        method: 'get',
+        params: { month },
+    });
+}
+
+export function getBikeTzData(day) {
+    return request({
+        url: '/extra/bikeTzData',
+        method: 'get',
+        params: { day },
+    });
+}
+
+export function getDdzhMaininfo() {
+    return request({
+        url: '/extra/mainInfo',
+        method: 'get',
+    });
+}
+
+export function getSjtj() {
+    return request({
+        url: '/extra/sjtj',
+        method: 'get',
+    });
+}
+
+export function getJylmComplaintList() {
+    return request({
+        url: '/jylm/complaint/list',
+        method: 'get',
+    });
+}
+
+// 上传投诉量数据
+export function uploadJylmComplaint(data) {
+    return request({
+        url: '/jylm/complaint/upload',
+        method: 'post',
+        data: data // 对应后端 @RequestBody
+    });
+}

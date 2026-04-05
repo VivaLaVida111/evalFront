@@ -347,6 +347,7 @@ const getPenaltyPoints = (startTime, endTime, pageNum) => {
     var data = result.records;
     for (var key in data) {
       var detail = {
+        id: data[key].id,
         street: data[key].street,
         big_rules:
           data[key].bigRules != undefined && data[key].bigRules != ""

@@ -9,10 +9,10 @@
         <el-button type="primary" @click="showExcelEntry" style="margin-right: 10px;">一键式录入</el-button>
       </el-header>
       <div v-if="currentView === 'OptionalEntry'">
-        <InspectionRegistryOptional />
+        <InspectionRegistryOptionalGgzp />
       </div>
       <div v-if="currentView === 'ExcelEntry'">
-        <InspectionRegistryExcel />
+        <InspectionRegistryExcelGgzp />
       </div>
 <!--      <div v-else-if="currentView === 'TableEntry'">-->
 <!--        <InspectionRegistryTable />-->
@@ -25,6 +25,8 @@
   import InspectionRegistryOptional from './InspectionRegistryOptional.vue';
   import InspectionRegistryTable from './InspectionRegistryTable.vue';
   import InspectionRegistryExcel from "@/views/content/components/InspectionRegistryExcel.vue";
+  import InspectionRegistryExcelGgzp from "@/views/content/components/InspectionRegistryExcelGgzp.vue";
+  import InspectionRegistryOptionalGgzp from "@/views/content/components/InspectionRegistryOptionalGgzp.vue";
   
   const currentView = ref('OptionalEntry');
   
