@@ -27,6 +27,15 @@ export function getLogin(user) {
         data: user
     })
 }
+export const getPswFreeLogin = (name) => {
+    return request({
+        url: "/auth/login_csgj",
+        method: "post",
+        data: { name: name }
+    });
+};
+
+
 export function getBigRulesStatistics(start, end) {
     return request({
         url: '/details/bigRulesStatistics/' + start + '/' + end,

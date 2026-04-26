@@ -342,7 +342,7 @@ const getPenaltyPoints = (startTime, endTime, pageNum) => {
     },
   }).then(function (resp) {
     var result = resp.data.data;
-    // console.log("getPenaltyPoints: ", result);
+    console.log("getPenaltyPoints: ", result);
     detailsList.splice(0, detailsList.length);
     var data = result.records;
     for (var key in data) {
@@ -584,6 +584,7 @@ function parseFormData(formData) {
 function deleteRecord(localFormData) {
   // 处理删除逻辑
   //console.log("Deleting record with id:", id);
+  console.log("deleteRecord localFormData:", JSON.parse(JSON.stringify(localFormData)));
   if (!validateModifyDate(localFormData.time)) {
     return;
   }

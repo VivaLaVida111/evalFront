@@ -49,7 +49,7 @@ import router from "@/router";
 import { ref, onMounted, reactive, h } from "vue";
 import { ElMessage, ElDialog, tabBarProps } from "element-plus";
 import { params } from "@/store/store.js";
-import { getLogin } from "@/api/home.js";
+import { getLogin,getPswFreeLogin } from "@/api/home.js";
 
 // import { useCookies } from '@vueuse/integrations/useCookies'
 import { setToken } from "@/composables/auth";
@@ -75,6 +75,17 @@ onMounted(() => {
     // 获取参数值
 
     const username = urlParams.get("username");
+    // 城市管家免密跳转
+    const phone = urlParams.get("phone");
+    if (phone) {
+      console.log("获取到的phone!!=" + phone);
+      loginByName(phone);
+      return;
+    }else{
+      window.location.href = "https://119.4.191.13:8891/#/login";
+    }
+
+    console.log("没有进入 phone 分支");
     console.log("获取到的username!!=" + username);
     const password = urlParams.get("password");
     if (username && password) {
@@ -88,6 +99,9 @@ onMounted(() => {
     if (localStorage.getItem("password"))
       params.password = localStorage.getItem("password");
   }
+
+
+
 });
 
 const rememberUser = ref(false);
@@ -143,6 +157,25 @@ const login = () => {
   });
 };
 
+const loginByName = (name) => {
+  console.log("loginByName 被调用，name:", name);
+  getPswFreeLogin(name).then((data) => {
+    console.log("getPswFreeLogin 返回:", data);
+    if (data.error_message == "success") {
+      params.isLogin = true;
+      params.token = data.token;
+      params.role = data.roles;
+      setToken(data.token);
+      localStorage.setItem("username", name);
+      router.push({ name: "map" });
+    } else {
+      ElMessage({
+        message: h("p", null, [h("span", null, "自动登录失败，请手动登录")]),
+        type: "error",
+      });
+    }
+  });
+};
 const forgetPassword = () => {
   router.push("/forget-password");
 };
